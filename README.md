@@ -24,7 +24,7 @@ or
 ## Quick Usage
 
 Step 1: Wrap your app in a GrowthBookProvider
-```ts
+```tsx
 import {GrowthBookClient, GrowthBookProvider} from '@growthbook/growthbook-react';
 
 // Instantiate a client
@@ -51,7 +51,7 @@ export default function App() {
 
 Step 2: Run experiments!
 
-```ts
+```tsx
 import {useExperiment} from '@growthbook/growthbook-react';
 
 export default function OtherComponent() {
