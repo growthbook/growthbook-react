@@ -19,8 +19,8 @@ export type {
 const SESSION_STORAGE_KEY = 'gb_forced_variations';
 
 export const GrowthBookContext = React.createContext<{
-  user?: GrowthBookUser;
-}>({});
+  user: GrowthBookUser | null;
+}>({ user: null });
 
 export function useExperiment<T>(exp: Experiment<T>): ExperimentResults<T> {
   const { user } = React.useContext(GrowthBookContext);
@@ -38,9 +38,9 @@ export function useExperiment<T>(exp: Experiment<T>): ExperimentResults<T> {
 }
 
 export const GrowthBookProvider: React.FC<{
-  user?: GrowthBookUser;
+  user?: GrowthBookUser | null;
   dev?: boolean;
-}> = ({ children, user, dev = false }) => {
+}> = ({ children, user = null, dev = false }) => {
   const [init, setInit] = React.useState(false);
   const [renderCount, setRenderCount] = React.useState(1);
 

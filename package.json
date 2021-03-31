@@ -48,17 +48,18 @@
   ],
   "devDependencies": {
     "@size-limit/preset-small-lib": "^4.10.1",
+    "@testing-library/react": "^11.2.6",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
+    "eslint-plugin-prettier": "^3.3.1",
     "husky": "^5.2.0",
+    "prettier": "^2.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "size-limit": "^4.10.1",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
-    "typescript": "^4.2.3",
-    "eslint-plugin-prettier": "^3.3.1",
-    "prettier": "^2.2.1"
+    "typescript": "^4.2.3"
   },
   "dependencies": {
     "@growthbook/growthbook": "^0.9.0"

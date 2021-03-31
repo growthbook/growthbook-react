@@ -44,13 +44,17 @@ export default function VariationSwitcher({
   React.useEffect(() => {
     if (!user) return;
 
+    let current = true;
     const unsubscriber = user.subscribe(() => {
       requestAnimationFrame(() => {
-        setVariations(user.getAssignedVariations());
+        current && setVariations(user.getAssignedVariations());
       });
     });
     setVariations(user.getAssignedVariations());
-    return unsubscriber;
+    return () => {
+      current = false;
+      unsubscriber();
+    };
   }, [user]);
 
   if (!variations.size) {
