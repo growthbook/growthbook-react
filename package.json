@@ -63,5 +63,13 @@
   },
   "dependencies": {
     "@growthbook/growthbook": "^0.9.0"
+  },
+  "description": "Powerful A/B testing for React Apps",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/growthbook/growthbook-react.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
