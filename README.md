@@ -23,33 +23,38 @@ or
 
 ## Quick Usage
 
+Step 1: Wrap your app in a GrowthBookProvider
 ```ts
-import {
-  GrowthBookClient, 
-  GrowthBookProvider, 
-  useExperiment
-} from '@growthbook/growthbook-react';
+import {GrowthBookClient, GrowthBookProvider} from '@growthbook/growthbook-react';
 
+// Instantiate a client
 const client = new GrowthBookClient();
 
-const App = () => {
-  // Get the user id from your auth system and keep a GrowthBookUser object in state
+export default function App() {
+  // Get the user id from your auth system
   const {userId} = useAuth();
+  
+  // Store a GrowthBookUser object in state
   const [growthBookUser, setGrowthBookUser] = useState(null);
   useEffect(() => {
     setGrowthBookUser(userId ? client.user({id: userId}) : null);
   }, [userId])
 
-  // Wrap your app in a GrowthBookProvider component to enable the useExperiment hook
+  // Wrap your app in a GrowthBookProvider component
   return (
     <GrowthBookProvider user={user} dev={true}>
       <OtherComponent/>
     </GrowthBookProvider>
   )
 }
+```
 
-// Use the hook anywhere in your app to run an experiment
-const OtherComponent = () => {
+Step 2: Run experiments!
+
+```ts
+import {useExperiment} from '@growthbook/growthbook-react';
+
+export default function OtherComponent() {
   const {value} = useExperiment({
     key: "headline-test",
     variations: ["Hello World", "Hola Mundo"]
