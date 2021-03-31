@@ -23,7 +23,7 @@ or
 
 ## Quick Usage
 
-Step 1: Wrap your app in a GrowthBookProvider
+Step 1: Wrap your app in GrowthBookProvider
 ```tsx
 import {GrowthBookClient, GrowthBookProvider} from '@growthbook/growthbook-react';
 
@@ -31,14 +31,8 @@ import {GrowthBookClient, GrowthBookProvider} from '@growthbook/growthbook-react
 const client = new GrowthBookClient();
 
 export default function App() {
-  // Get the user id from your auth system
-  const {userId} = useAuth();
-  
-  // Store a GrowthBookUser object in state
-  const [growthBookUser, setGrowthBookUser] = useState(null);
-  useEffect(() => {
-    setGrowthBookUser(userId ? client.user({id: userId}) : null);
-  }, [userId])
+  // TODO: Pull user id from your auth system (or use an anonymous cookie id)
+  const user = client.user({id: "1"});
 
   // Wrap your app in a GrowthBookProvider component
   return (
