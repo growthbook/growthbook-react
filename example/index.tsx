@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { GrowthBookProvider, GrowthBookClient } from '@growthbook/growthbook-react';
+import { GrowthBookProvider, GrowthBookClient } from '../dist';
 import Pricing from './Pricing';
 
 const client = new GrowthBookClient();

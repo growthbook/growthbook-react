@@ -50,19 +50,17 @@
     "@size-limit/preset-small-lib": "^4.10.1",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
-    "autoprefixer": "^10.2.5",
-    "cssnano": "^4.1.10",
     "husky": "^5.2.0",
-    "postcss": "^8.2.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "rollup-plugin-postcss": "^4.0.0",
     "size-limit": "^4.10.1",
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "eslint-plugin-prettier": "^3.3.1",
+    "prettier": "^2.2.1"
   },
   "dependencies": {
-    "@growthbook/growthbook": "^0.8.0"
+    "@growthbook/growthbook": "^0.9.0"
   }
 }

@@ -5,7 +5,7 @@ Small utility library to run controlled experiments (i.e. A/B/n tests) in React.
 ![Build Status](https://github.com/growthbook/growthbook-react/workflows/Build/badge.svg)
 
 -  No external dependencies
--  Lightweight and fast (3Kb gzipped)
+-  Lightweight and fast (4Kb gzipped)
 -  No HTTP requests, everything is defined and evaluated locally
 -  Works for both client and server-side rendering
 -  Written in Typescript with an extensive test suite
@@ -59,9 +59,15 @@ const OtherComponent = () => {
 }
 ```
 
+## Dev Mode
+
+When you pass `dev={true}` to the GrowthBookProvider, it enables development mode.  This adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the experiment combinations.
+
+![Dev Mode Variation Switcher](variation-switcher.png)
+
 ## Experiments
 
-As shown above, the simplest experiment you can define has 2 fields: `key` and `variations`.
+The simplest experiment you can define has just 2 fields: `key` and `variations`.
 
 There are a lot more configuration options you can specify.  Here is the full typescript definition:
 
@@ -73,7 +79,9 @@ interface Experiment {
     variations: any[];
     // How to weight traffic between variations. Array of floats that add to 1.
     weights?: number[];
-    // "running" is always active, "draft" is only active during QA. "stopped" is only active when forcing a winning variation
+    // "running" is always active
+    // "draft" is only active during QA
+    // "stopped" is only active when forcing a winning variation
     status?: "draft" | "running" | "stopped";
     // What percent of users should be included in the experiment. Float from 0 to 1.
     coverage?: number;
@@ -232,10 +240,6 @@ client.importOverrides({
     ...
 })
 ```
-
-## Dev Mode
-
-When you pass `dev={true}` to the GrowthBookProvider, it enables development mode.  This adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the combinations.
 
 ## Tracking Metrics and Analyzing Results
 
