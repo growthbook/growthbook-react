@@ -36,14 +36,14 @@ export default function App() {
 
   // Wrap your app in a GrowthBookProvider component
   return (
-    <GrowthBookProvider user={user} dev={true}>
+    <GrowthBookProvider user={user}>
       <OtherComponent/>
     </GrowthBookProvider>
   )
 }
 ```
 
-Step 2: Run experiments!
+Step 2a: Run experiments! (with React Hooks)
 
 ```tsx
 import {useExperiment} from '@growthbook/growthbook-react';
@@ -58,9 +58,32 @@ export default function OtherComponent() {
 }
 ```
 
+Step 2b: Run experiments! (with Class Components)
+
+```tsx
+import {withRunExperiment} from '@growthbook/growthbook-react';
+
+class MyComponent extends Component {
+  render() {
+    // The `runExperiment` prop is identical to the `useExperiment` hook
+    const {value} = this.props.runExperiment({
+      key: "headline-test",
+      variations: ["Hello World", "Hola Mundo"]
+    });
+
+    return <h1>{value}</h1>
+  }
+}
+
+// Wrap your component in `withRunExperiment`
+export default withRunExperiment(MyComponent);
+```
+
 ## Dev Mode
 
-When you pass `dev={true}` to the GrowthBookProvider, it enables development mode.  This adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the experiment combinations.
+If `process.env.NODE_ENV !== "production"` AND you are in a browser environment, dev mode is enabled by default. You can override this behavior by explicitly passing in the `dev` prop to `GrowthBookProvider`.
+
+Dev mode adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the experiment combinations.
 
 ![Dev Mode Variation Switcher](variation-switcher.png)
 

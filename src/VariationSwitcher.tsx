@@ -15,7 +15,7 @@ export default function VariationSwitcher({
   user,
 }: {
   forceVariation: (key: string, variation: number) => void;
-  user?: GrowthBookUser;
+  user: GrowthBookUser;
   renderCount: number;
 }): null | React.ReactElement {
   const [variations, setVariations] = React.useState<
@@ -31,6 +31,10 @@ export default function VariationSwitcher({
 
   // Restore open state from sessionStorage
   React.useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+
     try {
       if (window.sessionStorage.getItem(SESSION_STORAGE_OPEN_KEY)) {
         setOpen(true);
@@ -42,7 +46,9 @@ export default function VariationSwitcher({
 
   // When a user is put into an experiment, schedule an update of the UI
   React.useEffect(() => {
-    if (!user) return;
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
 
     let current = true;
     const unsubscriber = user.subscribe(() => {
@@ -56,6 +62,10 @@ export default function VariationSwitcher({
       unsubscriber();
     };
   }, [user]);
+
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
 
   if (!variations.size) {
     return null;

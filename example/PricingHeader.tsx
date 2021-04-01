@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useExperiment} from '../dist/.';
+import {useExperiment} from '../dist/';
 
 export default function PricingHeader() {
   const {value} = useExperiment({

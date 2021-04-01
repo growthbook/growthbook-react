@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "parcel index.html",
+    "start:prod": "NODE_ENV=production parcel index.html",
     "build": "parcel build index.html"
   },
   "dependencies": {

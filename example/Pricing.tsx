@@ -3,7 +3,7 @@ import TopNav from './TopNav';
 import PricingHeader from './PricingHeader';
 import PlanBox from './PlanBox';
 import Footer from './Footer';
-import { useExperiment } from '../dist';
+import { useExperiment } from '../dist/';
 
 export default function Pricing() {
   const { value: showCallout } = useExperiment({
