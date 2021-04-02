@@ -32,6 +32,7 @@ function runExperiment<T>(
 
   return {
     experiment: exp,
+    variationId: 0,
     inExperiment: false,
     index: 0,
     value: exp.variations[0],
