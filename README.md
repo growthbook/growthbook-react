@@ -16,6 +16,10 @@ Powerful A/B testing for React. Built for developers to allow for modern A/B tes
 -  **Use your existing event tracking** (Segment, Snowplow, Mixpanel, custom)
 -  **Adjust variation weights and targeting** without deploying new code
 
+Join [our Growth Book Users Slack community](https://join.slack.com/t/growthbookusers/shared_invite/zt-oiq9s1qd-dHHvw4xjpnoRV1QQrq6vUg) if you need help, want to chat, or are thinking of a new feature. We're here to help - and to make Growth Book even better.
+
+
+
 ## Installation
 
 `yarn add @growthbook/growthbook-react` 
