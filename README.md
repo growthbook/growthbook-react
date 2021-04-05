@@ -1,4 +1,5 @@
 <p align="center"><img src="https://www.growthbook.io/logos/growthbook-logo@2x.png" width="400px" /></p>
+
 # Growth Book React Library
 
 Powerful A/B testing for React. Built for developers to allow for modern A/B testing on your website or app, with no need to send data to 3rd parties. 
