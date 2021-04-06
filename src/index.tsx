@@ -92,6 +92,39 @@ export const GrowthBookProvider: React.FC<{
     }
   }, [user, init]);
 
+  const forceVariation = React.useCallback(
+    (key: string, variation: number) => {
+      if (!user) return;
+      user.client.forcedVariations.set(key, variation);
+      setRenderCount((i) => i + 1);
+      try {
+        let forced = window.sessionStorage.getItem(SESSION_STORAGE_KEY) || '{}';
+        let json = JSON.parse(forced);
+        json[key] = variation;
+        window.sessionStorage.setItem(
+          SESSION_STORAGE_KEY,
+          JSON.stringify(json)
+        );
+      } catch (e) {
+        // Ignore sessionStorage errors
+      }
+    },
+    [user]
+  );
+
+  let devMode: React.ReactNode = null;
+  if (process.env.NODE_ENV !== 'production') {
+    if (user && !disableDevMode) {
+      devMode = (
+        <VariationSwitcher
+          user={user}
+          renderCount={renderCount}
+          forceVariation={forceVariation}
+        />
+      );
+    }
+  }
+
   return (
     <GrowthBookContext.Provider
       value={{
@@ -99,28 +132,7 @@ export const GrowthBookProvider: React.FC<{
       }}
     >
       {children}
-      {user && !disableDevMode && (
-        <VariationSwitcher
-          user={user}
-          renderCount={renderCount}
-          forceVariation={(key, variation) => {
-            user.client.forcedVariations.set(key, variation);
-            setRenderCount((i) => i + 1);
-            try {
-              let forced =
-                window.sessionStorage.getItem(SESSION_STORAGE_KEY) || '{}';
-              let json = JSON.parse(forced);
-              json[key] = variation;
-              window.sessionStorage.setItem(
-                SESSION_STORAGE_KEY,
-                JSON.stringify(json)
-              );
-            } catch (e) {
-              // Ignore sessionStorage errors
-            }
-          }}
-        />
-      )}
+      {devMode}
     </GrowthBookContext.Provider>
   );
 };
