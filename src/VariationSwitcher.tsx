@@ -70,7 +70,6 @@ export default function VariationSwitcher({
     experiment: string;
     capturedImages?: string[];
     croppedImages?: string[];
-    zip?: string;
   }>(null);
 
   // Restore open state from sessionStorage
@@ -243,14 +242,12 @@ body {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                if (screenshotData.croppedImages && screenshotData.zip) {
+                if (screenshotData.croppedImages) {
                   screenshotData.croppedImages.forEach(URL.revokeObjectURL);
-                  URL.revokeObjectURL(screenshotData.zip);
                 }
                 setScreenshotData({
                   ...screenshotData,
                   croppedImages: undefined,
-                  zip: undefined,
                 });
                 setScreenshotSelection({
                   selecting: false,
@@ -264,18 +261,11 @@ body {
             >
               Back
             </button>
-            <a
-              href={screenshotData.zip}
-              download={screenshotData.experiment + '.zip'}
-            >
-              Download All (zip)
-            </a>
             <button
               onClick={(e) => {
                 e.preventDefault();
-                if (screenshotData.croppedImages && screenshotData.zip) {
+                if (screenshotData.croppedImages) {
                   screenshotData.croppedImages.forEach(URL.revokeObjectURL);
-                  URL.revokeObjectURL(screenshotData.zip);
                 }
                 if (screenshotData.capturedImages) {
                   screenshotData.capturedImages.forEach(URL.revokeObjectURL);
@@ -369,8 +359,7 @@ body {
               });
 
               if (screenshotData.capturedImages) {
-                const { imageUrls, zip } = await cropScreenshots(
-                  screenshotData.experiment,
+                const { imageUrls } = await cropScreenshots(
                   screenshotData.capturedImages,
                   screenshotSelection.x1,
                   screenshotSelection.y1,
@@ -379,8 +368,7 @@ body {
                 );
                 setScreenshotData({
                   ...screenshotData,
-                  croppedImages: imageUrls,
-                  zip,
+                  croppedImages: imageUrls
                 });
               }
             }}

@@ -1,5 +1,3 @@
-import jsZip from 'jszip';
-
 export async function captureScreenshots(
   numVariations: number,
   forceVariation: (i: number) => void
@@ -42,8 +40,11 @@ export async function captureScreenshots(
       try {
         let urls: string[] = [];
 
-        const existingCursor = document.body.style.cursor;
-        document.body.style.cursor = 'none !important';
+        // Hide the cursor while screenshots are being taken
+        const style = document.createElement('style');
+        style.innerHTML = '* {cursor: none!important}';
+        document.head.append(style);
+
         for (let i = 0; i < numVariations; i++) {
           console.log('Forcing variation ', i);
           forceVariation(i);
@@ -59,8 +60,9 @@ export async function captureScreenshots(
           });
           urls.push(url);
         }
-        document.body.style.cursor = existingCursor;
 
+        // Clean up
+        style.remove();
         canvas.remove();
         video.remove();
         captureStream
@@ -78,7 +80,6 @@ export async function captureScreenshots(
 }
 
 export async function cropScreenshots(
-  experimentId: string,
   urls: string[],
   x1: number,
   y1: number,
@@ -86,7 +87,6 @@ export async function cropScreenshots(
   y2: number
 ): Promise<{
   imageUrls: string[];
-  zip: string;
 }> {
   const w = Math.abs(x2 - x1);
   const h = Math.abs(y2 - y1);
@@ -98,8 +98,6 @@ export async function cropScreenshots(
   if (!ctx) throw new Error('Could not get canvas context');
 
   const imageUrls: string[] = [];
-
-  const zip = new jsZip();
 
   for (let i = 0; i < urls.length; i++) {
     await new Promise((resolve, reject) => {
@@ -132,25 +130,14 @@ export async function cropScreenshots(
           return;
         }
         imageUrls[i] = URL.createObjectURL(b);
-        zip.file(experimentId + '_' + i + '.png', b);
         resolve(null);
       });
     });
   }
 
-  const zipBlob = await zip.generateAsync({
-    type: 'blob',
-    compression: 'DEFLATE',
-    compressionOptions: {
-      level: 6,
-    },
-  });
-  const zipUrl = URL.createObjectURL(zipBlob);
-
   canvas.remove();
 
   return {
-    imageUrls,
-    zip: zipUrl,
+    imageUrls
   };
 }
