@@ -368,7 +368,7 @@ body {
                 );
                 setScreenshotData({
                   ...screenshotData,
-                  croppedImages: imageUrls
+                  croppedImages: imageUrls,
                 });
               }
             }}

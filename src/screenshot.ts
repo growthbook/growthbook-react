@@ -138,6 +138,6 @@ export async function cropScreenshots(
   canvas.remove();
 
   return {
-    imageUrls
+    imageUrls,
   };
 }
