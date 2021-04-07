@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {
+import type {
   Experiment,
   ExperimentResults,
 } from '@growthbook/growthbook/dist/types';
-import GrowthBookUser from '@growthbook/growthbook/dist/user';
+import type GrowthBookUser from '@growthbook/growthbook/dist/user';
 import VariationSwitcher from './VariationSwitcher';
 
 export { default as GrowthBookClient } from '@growthbook/growthbook';
@@ -65,10 +65,12 @@ export const withRunExperiment = <P extends WithRunExperimentProps>(
   </GrowthBookContext.Consumer>
 );
 
-export const GrowthBookProvider: React.FC<{
-  user?: GrowthBookUser | null;
-  disableDevMode?: boolean;
-}> = ({ children, user = null, disableDevMode = false }) => {
+function useForceVariation(
+  user: GrowthBookUser | null
+): {
+  forceVariation: (key: string, variation: number) => void;
+  renderCount: number;
+} {
   const [init, setInit] = React.useState(false);
   const [renderCount, setRenderCount] = React.useState(1);
 
@@ -92,7 +94,7 @@ export const GrowthBookProvider: React.FC<{
     }
   }, [user, init]);
 
-  const forceVariation = React.useCallback(
+  const forceVariation = /*#__PURE__*/ React.useCallback(
     (key: string, variation: number) => {
       if (!user) return;
       user.client.forcedVariations.set(key, variation);
@@ -111,6 +113,20 @@ export const GrowthBookProvider: React.FC<{
     },
     [user]
   );
+
+  return {
+    renderCount,
+    forceVariation,
+  };
+}
+
+export const GrowthBookProvider: React.FC<{
+  user?: GrowthBookUser | null;
+  disableDevMode?: boolean;
+}> = ({ children, user = null, disableDevMode = false }) => {
+  // Mark this as pure since there are no side-effects
+  // In production, these variables are never used so they will be removed from the output
+  const { renderCount, forceVariation } = /*#__PURE__*/ useForceVariation(user);
 
   let devMode: React.ReactNode = null;
   if (process.env.NODE_ENV !== 'production') {

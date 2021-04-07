@@ -351,7 +351,7 @@ body {
                 y2: e.clientY,
               });
             }}
-            onMouseUp={async () => {
+            onMouseUp={() => {
               setScreenshotSelection({
                 ...screenshotSelection,
                 finished: true,
@@ -359,16 +359,17 @@ body {
               });
 
               if (screenshotData.capturedImages) {
-                const { imageUrls } = await cropScreenshots(
+                cropScreenshots(
                   screenshotData.capturedImages,
                   screenshotSelection.x1,
                   screenshotSelection.y1,
                   screenshotSelection.x2,
                   screenshotSelection.y2
-                );
-                setScreenshotData({
-                  ...screenshotData,
-                  croppedImages: imageUrls,
+                ).then(({ imageUrls }) => {
+                  setScreenshotData({
+                    ...screenshotData,
+                    croppedImages: imageUrls,
+                  });
                 });
               }
             }}
