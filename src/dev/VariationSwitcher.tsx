@@ -1,14 +1,12 @@
 import * as React from 'react';
 import GrowthBookUser from '@growthbook/growthbook/dist/user';
+import { captureScreenshots } from './screenshot';
+import CameraIcon from './CameraIcon';
+import { default as COLORS } from './colors';
+import ScreenshotEditor from './ScreenshotEditor';
+import ScreenshotPromptOverlay from './ScreenshotPromptOverlay';
 
 const SESSION_STORAGE_OPEN_KEY = 'gbdev_open';
-const COLORS = {
-  bg: '#2f0e6c',
-  shadow: 'rgba(47,14,108,60%)',
-  text: '#f5f7fa',
-  selected: '#8fd5ec',
-  hover: '#dde8f8',
-};
 
 export default function VariationSwitcher({
   forceVariation,
@@ -29,12 +27,15 @@ export default function VariationSwitcher({
   >(new Map());
   const [open, setOpen] = React.useState(false);
 
+  const [screenshotData, setScreenshotData] = React.useState<null | {
+    experiment: string;
+    capturedImages?: string[];
+    w?: number;
+    h?: number;
+  }>(null);
+
   // Restore open state from sessionStorage
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      return;
-    }
-
     try {
       if (window.sessionStorage.getItem(SESSION_STORAGE_OPEN_KEY)) {
         setOpen(true);
@@ -44,12 +45,31 @@ export default function VariationSwitcher({
     }
   }, []);
 
+  // Capture screenshots of experiment variations
+  const screenshotExperiment = screenshotData?.experiment;
+  const screenshotNumVariations =
+    variations.get(screenshotExperiment || '')?.possible?.length || 0;
+  React.useEffect(() => {
+    if (!screenshotExperiment) return;
+    captureScreenshots(screenshotNumVariations, (i) => {
+      forceVariation(screenshotExperiment, i);
+    })
+      .then(({ capturedImages, w, h }) => {
+        setScreenshotData({
+          experiment: screenshotExperiment,
+          capturedImages,
+          w,
+          h,
+        });
+      })
+      .catch((e) => {
+        console.error(e);
+        setScreenshotData(null);
+      });
+  }, [screenshotExperiment, forceVariation, screenshotNumVariations]);
+
   // When a user is put into an experiment, schedule an update of the UI
   React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production') {
-      return;
-    }
-
     let current = true;
     const unsubscriber = user.subscribe(() => {
       requestAnimationFrame(() => {
@@ -66,9 +86,29 @@ export default function VariationSwitcher({
   if (process.env.NODE_ENV === 'production') {
     return null;
   }
-
   if (!variations.size) {
     return null;
+  }
+  if (screenshotData) {
+    if (screenshotData.capturedImages) {
+      return (
+        <ScreenshotEditor
+          capturedImages={screenshotData.capturedImages}
+          close={() => {
+            screenshotData.capturedImages &&
+              screenshotData.capturedImages.forEach(URL.revokeObjectURL);
+            setScreenshotData(null);
+          }}
+          experiment={screenshotData.experiment}
+          imageH={screenshotData.h || 0}
+          imageW={screenshotData.w || 0}
+          variationNames={(
+            variations.get(screenshotData.experiment)?.possible || []
+          ).map((v) => JSON.stringify(v))}
+        />
+      );
+    }
+    return <ScreenshotPromptOverlay />;
   }
 
   return (
@@ -193,6 +233,18 @@ export default function VariationSwitcher({
   background: rgba(255,255,255, 40%);
   border-radius: 6px;
 }
+.growthbook_dev button {
+  background: transparent;
+  border: 0;
+  padding: 3px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: transform 0.1s;
+  color: ${COLORS.text}
+}
+.growthbook_dev button:hover {
+  transform: scale(1.1);
+}
       `,
         }}
       />
@@ -220,7 +272,20 @@ export default function VariationSwitcher({
         {Array.from(variations).map(([key, { assigned, possible }]) => {
           return (
             <div className="exp" key={key}>
-              <h5>{key}</h5>
+              <h5>
+                {key}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setScreenshotData({
+                      experiment: key,
+                    });
+                  }}
+                  title="Take Screenshots"
+                >
+                  <CameraIcon />
+                </button>
+              </h5>
               <table>
                 <tbody>
                   {possible.map((value, i) => (
