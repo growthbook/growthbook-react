@@ -281,6 +281,7 @@ export default function VariationSwitcher({
                       experiment: key,
                     });
                   }}
+                  title="Take Screenshots"
                 >
                   <CameraIcon />
                 </button>

@@ -94,6 +94,7 @@ body {
   width: 70vw;
   box-sizing: border-box;
   padding: 5px;
+  background: #ddd;
 }
 .growthbook_screenshot * {
   user-select: none;
@@ -266,6 +267,8 @@ body {
   padding: 5px;
   text-align: center;
   z-index: 10;
+  background: ${COLORS.bg};
+  color: ${COLORS.text};
   border-bottom: 3px solid rgba(0,0,0,.5);
 }
 .growthbook_screenshot .variations-title {
