@@ -33,7 +33,8 @@ export function captureScreenshots(
 
             // Hide the cursor while screenshots are being taken
             const style = document.createElement('style');
-            style.innerHTML = '* {cursor: none!important}';
+            style.innerHTML =
+              '* {cursor: none!important;} .growthbook_screenshot {display:none!important;}';
             document.head.append(style);
 
             let result = Promise.resolve();
