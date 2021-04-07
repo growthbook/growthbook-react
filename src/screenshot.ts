@@ -1,7 +1,7 @@
 export function captureScreenshots(
   numVariations: number,
   forceVariation: (i: number) => void
-): Promise<string[]> {
+): Promise<{ capturedImages: string[]; w: number; h: number }> {
   console.log('Getting capture stream', numVariations);
 
   return (navigator.mediaDevices as any)
@@ -24,6 +24,9 @@ export function captureScreenshots(
           reject(new Error('Could not get canvas context'));
           return;
         }
+
+        const w = settings.width || 0;
+        const h = settings.height || 0;
 
         const video = document.createElement('video');
         video.autoplay = true;
@@ -70,7 +73,11 @@ export function captureScreenshots(
                   .getTracks()
                   .forEach((track: MediaStreamTrack) => track.stop());
 
-                resolve(urls);
+                resolve({
+                  capturedImages: urls,
+                  w,
+                  h,
+                });
               })
               .catch((e) => {
                 reject(e);
@@ -85,15 +92,13 @@ export function captureScreenshots(
     });
 }
 
-export function cropScreenshots(
-  urls: string[],
+export function cropScreenshot(
+  url: string,
   x1: number,
   y1: number,
   x2: number,
   y2: number
-): Promise<{
-  imageUrls: string[];
-}> {
+): Promise<string> {
   const w = Math.abs(x2 - x1);
   const h = Math.abs(y2 - y1);
 
@@ -103,56 +108,43 @@ export function cropScreenshots(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Could not get canvas context');
 
-  const imageUrls: string[] = [];
-
-  let result = Promise.resolve();
-  for (let i = 0; i < urls.length; i++) {
-    result = result
-      .then(
-        () =>
-          new Promise<void>((resolve, reject) => {
-            const src = new Image();
-            src.onload = () => {
-              ctx.drawImage(
-                src,
-                // src x,y,w,h
-                Math.min(x1, x2),
-                Math.min(y1, y2),
-                w,
-                h,
-                // dest x,y,w,h
-                0,
-                0,
-                w,
-                h
-              );
-              resolve();
-            };
-            src.onerror = (e) => {
-              reject(e);
-            };
-            src.src = urls[i];
-          })
-      )
-      .then(
-        () =>
-          new Promise<void>((resolve, reject) => {
-            canvas.toBlob((b) => {
-              if (!b) {
-                reject('Error getting canvas blob');
-                return;
-              }
-              imageUrls[i] = URL.createObjectURL(b);
-              resolve();
-            });
-          })
+  return new Promise<void>((resolve, reject) => {
+    const src = new Image();
+    src.onload = () => {
+      ctx.drawImage(
+        src,
+        // src x,y,w,h
+        Math.min(x1, x2),
+        Math.min(y1, y2),
+        w,
+        h,
+        // dest x,y,w,h
+        0,
+        0,
+        w,
+        h
       );
-  }
-
-  return result.then(() => {
-    canvas.remove();
-    return {
-      imageUrls,
+      resolve();
     };
-  });
+    src.onerror = (e) => {
+      reject(e);
+    };
+    src.src = url;
+  })
+    .then(
+      () =>
+        new Promise<string>((resolve, reject) => {
+          canvas.toBlob((b) => {
+            if (!b) {
+              reject('Error getting canvas blob');
+              return;
+            }
+            resolve(URL.createObjectURL(b));
+          });
+        })
+    )
+    .then((url) => {
+      canvas.remove();
+      return url;
+    });
 }

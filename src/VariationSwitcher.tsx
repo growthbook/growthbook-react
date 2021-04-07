@@ -1,6 +1,6 @@
 import * as React from 'react';
 import GrowthBookUser from '@growthbook/growthbook/dist/user';
-import { captureScreenshots, cropScreenshots } from './screenshot';
+import { captureScreenshots } from './screenshot';
 
 const SESSION_STORAGE_OPEN_KEY = 'gbdev_open';
 const COLORS = {
@@ -10,6 +10,36 @@ const COLORS = {
   selected: '#8fd5ec',
   hover: '#dde8f8',
 };
+
+type ScrenshotSelectionResizing =
+  | 'top'
+  | 'bottom'
+  | 'left'
+  | 'right'
+  | 'tl'
+  | 'tr'
+  | 'bl'
+  | 'br';
+
+type ScreenshotSelection = {
+  resizing: false | ScrenshotSelectionResizing;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+};
+
+/*
+function getDragProps(
+  setScreenshotSelection: React.Dispatch<React.SetStateAction<ScreenshotSelection>>,
+  ew: boolean,
+  ns: boolean,
+) {
+  return {
+
+  }
+}
+*/
 
 function Camera() {
   return (
@@ -58,9 +88,11 @@ export default function VariationSwitcher({
     >
   >(new Map());
   const [open, setOpen] = React.useState(false);
-  const [screenshotSelection, setScreenshotSelection] = React.useState({
-    selecting: false,
-    finished: false,
+  const [
+    screenshotSelection,
+    setScreenshotSelection,
+  ] = React.useState<ScreenshotSelection>({
+    resizing: false,
     x1: 0,
     y1: 0,
     x2: 0,
@@ -69,7 +101,8 @@ export default function VariationSwitcher({
   const [screenshotData, setScreenshotData] = React.useState<null | {
     experiment: string;
     capturedImages?: string[];
-    croppedImages?: string[];
+    w?: number;
+    h?: number;
   }>(null);
 
   // Restore open state from sessionStorage
@@ -92,10 +125,19 @@ export default function VariationSwitcher({
     captureScreenshots(screenshotNumVariations, (i) => {
       forceVariation(screenshotExperiment, i);
     })
-      .then((capturedImages) => {
+      .then(({ capturedImages, w, h }) => {
         setScreenshotData({
           experiment: screenshotExperiment,
           capturedImages,
+          w,
+          h,
+        });
+        setScreenshotSelection({
+          resizing: false,
+          x1: 0,
+          y1: 0,
+          x2: 100,
+          y2: 100,
         });
       })
       .catch((e) => {
@@ -145,95 +187,241 @@ export default function VariationSwitcher({
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100%;
 }
     `;
-
-    if (screenshotData.croppedImages) {
+    if (screenshotData.capturedImages) {
       return (
         <div className="growthbook_screenshot white">
-          <style>{`
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
 ${globalStyle}
-body {
-  overflow: hidden;
+.growthbook_screenshot .composite {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  bottom: 0;
+  width: 70vw;
+  box-sizing: border-box;
+  padding: 5px;
 }
-.growthbook_screenshot .screenshots {
-  display: flex;
-  flex-wrap: wrap;
-  overflow-y: auto;
-  position: fixed;
+.growthbook_screenshot * {
+  user-select: none;
+}
+.growthbook_screenshot .canvases {
+  max-width: 100%;
+  max-height: 100%;
+  display: inline-block;
+  position: relative;
+}
+.growthbook_screenshot .canvases img {
+  opacity: ${(1 / screenshotData.capturedImages.length).toFixed(3)};
+  pointer-events: none;
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 60px;
-  place-content: flex-start;
-  align-items: flex-start;
 }
-.growthbook_screenshot img {
-  max-width: 100%;
-  display: block;
-  border: 1px solid #ddd;
-  margin-bottom: 8px;
+.growthbook_screenshot .canvases img:first-child {
+  opacity: 1;
+  position: relative;
 }
-.growthbook_screenshot .screenshots > div {
-  background: #f4f4f4;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
-  margin: 10px;
-  text-align: center;
+.growthbook_screenshot .selection_box {
+  position: absolute;
+  border: 3px dashed tomato;
 }
-.growthbook_screenshot .screenshots a {
-  display: inline-block;
-  padding: 4px 12px;
-  background: #333;
-  color: #fff;
-  border: 0;
-  border-radius: 5px;
-  text-decoration: none;
-  transition: background-color 0.2s;
+.growthbook_screenshot .selection_box > div {
+  position: absolute;
+  background: tomato;
+  opacity: 0.01;
+  transition: opacity 0.1s;
 }
-.growthbook_screenshot a:hover {
-  color: #fff;
-  text-decoration: none;
-  background: #555;
+.growthbook_screenshot .selection_box > div:hover {
+  opacity: 0.1;
 }
-.growthbook_screenshot .controls {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px;
-  position: fixed;
-  bottom: 0;
+.growthbook_screenshot .w20 {
+  width: 20px;
+}
+.growthbook_screenshot .h20 {
+  height: 20px;
+}
+.growthbook_screenshot .l0 {
   left: 0;
+}
+.growthbook_screenshot .t0 {
+  top: 0;
+}
+.growthbook_screenshot .r0 {
   right: 0;
+}
+.growthbook_screenshot .b0 {
+  bottom: 0;
+}
+.growthbook_screenshot .l20 {
+  left: 20px;
+}
+.growthbook_screenshot .t20 {
+  top: 20px;
+}
+.growthbook_screenshot .r20 {
+  right: 20px;
+}
+.growthbook_screenshot .b20 {
+  bottom: 20px;
+}
+.growthbook_screenshot .ns {
+  cursor: ns-resize;
+}
+.growthbook_screenshot .ew {
+  cursor: ew-resize;
+}
+.growthbook_screenshot .nesw {
+  cursor: nesw-resize;
+}
+.growthbook_screenshot .nwse {
+  cursor: nwse-resize;
+}
+.growthbook_screenshot .variations {
+  position: absolute;
+  top: 70px;
+  bottom: 60px;
+  left: 70vw;
+  width: 30vw;
+  box-sizing: border-box;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: ${COLORS.bg};
   color: ${COLORS.text};
-  line-height: 30px;
 }
-.growthbook_screenshot .controls a {
+.growthbook_screenshot .controls {
+  position: absolute;
+  bottom: 0;
+  height: 60px;
+  width: 30vw;
+  left: 70vw;
+  background: ${COLORS.bg};
+  text-align: center;
+  padding: 13px;
+  box-sizing: border-box;
+  border-top: 2px solid ${COLORS.selected};
+}
+.growthbook_screenshot .controls button {
+  border: 0;
+  background: ${COLORS.selected};
+  color: ${COLORS.bg};
+  padding: 7px 25px;
+  box-sizing: border-box;
+  line-height: 20px;
+  text-align: center;
+  display: inline-block;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.growthbook_screenshot .controls button:hover {
+  transform: scale(1.1);
+}
+.growthbook_screenshot .variations > div {
+  margin: 10px 0;
+}
+.growthbook_screenshot .variations .img {
+  border: 1px solid #ddd;
+}
+.growthbook_screenshot .composite-title {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70vw;
+  height: 70px;
+  box-sizing: border-box;
+  padding: 5px;
+  text-align: center;
+  z-index: 10;
+  border-bottom: 3px solid rgba(0,0,0,.5);
+}
+.growthbook_screenshot .variations-title {
+  position: absolute;
+  top: 0;
+  left: 70vw;
+  width: 30vw;
+  height: 70px;
+  box-sizing: border-box;
+  padding: 5px;
+  text-align: center;
+  z-index: 10;
+  border-bottom: 3px solid rgba(0,0,0,.5);
+  background: ${COLORS.bg};
   color: ${COLORS.text};
-  padding: 0 5px;
-  background: rgba(255,255,255,0);
-  transition: background-color 0.2s;
 }
-.growthbook_screenshot .controls a:hover {
-  color: ${COLORS.text};
-  background: rgba(255,255,255,0.2);
+.growthbook_screenshot h2 {
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: bold;
+  margin: 0;
+  padding: 0;
 }
-          `}</style>
-          <div className="screenshots">
-            {screenshotData.croppedImages.map((src, i) => {
+.growthbook_screenshot p {
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0;
+  padding: 0;
+}
+            `,
+            }}
+          />
+          <div className="composite-title">
+            <h2>Composite Overlay</h2>
+            <p>Drag the red border to crop your screenshots</p>
+          </div>
+          <div className="variations-title">
+            <h2>Variations</h2>
+            <p>Download the screenshots here</p>
+          </div>
+          <div className="variations">
+            <h3>{screenshotData.experiment}</h3>
+            {screenshotData.capturedImages.map((u, i) => {
+              const wPercent =
+                Math.abs(screenshotSelection.x2 - screenshotSelection.x1) / 100;
+              const hPercent =
+                Math.abs(screenshotSelection.y2 - screenshotSelection.y1) / 100;
+              const w = wPercent * (screenshotData.w || 1);
+              const h = hPercent * (screenshotData.h || 1);
+              const xOffset = (
+                Math.min(screenshotSelection.x1, screenshotSelection.x2) /
+                (1 - wPercent)
+              ).toFixed(2);
+              const yOffset = (
+                Math.min(screenshotSelection.y1, screenshotSelection.y2) /
+                (1 - hPercent)
+              ).toFixed(2);
+
               return (
                 <div key={i}>
-                  <img
-                    src={src}
-                    alt={`Screenshot of ${screenshotData.experiment} variation ${i}`}
+                  <h5>
+                    {JSON.stringify(
+                      variations.get(screenshotData.experiment)?.possible?.[
+                        i
+                      ] ?? `Variation ${i}`
+                    )}
+                  </h5>
+                  <div
+                    className="img"
+                    style={{
+                      overflow: 'hidden',
+                      height: 0,
+                      width: '100%',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundImage: `url(${u})`,
+                      backgroundSize: (100 / wPercent).toFixed(3) + '%',
+                      paddingTop: ((100 * h) / w).toFixed(3) + '%',
+                      backgroundPosition: `${xOffset}% ${yOffset}%`,
+                    }}
                   />
-                  <a
-                    href={src}
-                    download={`${screenshotData.experiment}_${i}.png`}
-                  >
-                    Download
-                  </a>
                 </div>
               );
             })}
@@ -242,156 +430,118 @@ body {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                if (screenshotData.croppedImages) {
-                  screenshotData.croppedImages.forEach(URL.revokeObjectURL);
-                }
-                setScreenshotData({
-                  ...screenshotData,
-                  croppedImages: undefined,
-                });
-                setScreenshotSelection({
-                  selecting: false,
-                  finished: false,
-                  x1: 0,
-                  x2: 0,
-                  y1: 0,
-                  y2: 0,
-                });
-              }}
-            >
-              Back
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                if (screenshotData.croppedImages) {
-                  screenshotData.croppedImages.forEach(URL.revokeObjectURL);
-                }
                 if (screenshotData.capturedImages) {
                   screenshotData.capturedImages.forEach(URL.revokeObjectURL);
+                  setScreenshotData(null);
                 }
-                setScreenshotData(null);
-                setScreenshotSelection({
-                  selecting: false,
-                  finished: false,
-                  x1: 0,
-                  x2: 0,
-                  y1: 0,
-                  y2: 0,
-                });
               }}
             >
-              Close
+              Done
             </button>
           </div>
-        </div>
-      );
-    }
-    if (screenshotData.capturedImages) {
-      return (
-        <div className="growthbook_screenshot">
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `
-.growthbook_screenshot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fff;
-}
-.growthbook_screenshot .canvases, .growthbook_screenshot .canvas_overlay, .growthbook_screenshot .canvases img {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-}
-.growthbook_screenshot .canvases img {
-  opacity: ${(1 / screenshotData.capturedImages.length).toFixed(3)};
-  pointer-events: none;
-}
-.growthbook_screenshot.canvases img:first-child {
-  opacity: 1;
-}
-.growthbook_screenshot .selection_box {
-  position: absolute;
-  border: 3px dashed tomato;
-}
-            `,
-            }}
-          />
-          <div className="canvases">
-            {screenshotData.capturedImages.map((u, i) => (
-              <img
-                src={u}
-                key={i}
-                alt={`Screenshot of ${screenshotData.experiment} variation ${i}`}
-              />
-            ))}
-          </div>
-          <div
-            className="canvas_overlay"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              setScreenshotSelection({
-                selecting: true,
-                finished: false,
-                x1: e.clientX,
-                y1: e.clientY,
-                x2: e.clientX,
-                y2: e.clientY,
-              });
-            }}
-            onMouseMove={(e) => {
-              setScreenshotSelection({
-                ...screenshotSelection,
-                x2: e.clientX,
-                y2: e.clientY,
-              });
-            }}
-            onMouseUp={() => {
-              setScreenshotSelection({
-                ...screenshotSelection,
-                finished: true,
-                selecting: false,
-              });
-
-              if (screenshotData.capturedImages) {
-                cropScreenshots(
-                  screenshotData.capturedImages,
-                  screenshotSelection.x1,
-                  screenshotSelection.y1,
-                  screenshotSelection.x2,
-                  screenshotSelection.y2
-                ).then(({ imageUrls }) => {
-                  setScreenshotData({
-                    ...screenshotData,
-                    croppedImages: imageUrls,
-                  });
-                });
-              }
-            }}
-          >
-            {screenshotSelection.selecting && (
+          <div className="composite">
+            <div className="canvases">
+              {screenshotData.capturedImages.map((u, i) => (
+                <img
+                  src={u}
+                  key={i}
+                  alt={`Screenshot of ${screenshotData.experiment} variation ${i}`}
+                />
+              ))}
               <div
-                className="selection_box"
-                style={{
-                  left: Math.min(
-                    screenshotSelection.x1,
-                    screenshotSelection.x2
-                  ),
-                  top: Math.min(screenshotSelection.y1, screenshotSelection.y2),
-                  width: Math.abs(
-                    screenshotSelection.x1 - screenshotSelection.x2
-                  ),
-                  height: Math.abs(
-                    screenshotSelection.y1 - screenshotSelection.y2
-                  ),
+                className="canvas_overlay fullscreen"
+                onMouseDown={(e) => {
+                  const target = e.target as HTMLElement;
+                  if (!target) return;
+
+                  const prop = target.dataset
+                    .prop as ScrenshotSelectionResizing;
+                  if (!prop) return;
+
+                  setScreenshotSelection({
+                    ...screenshotSelection,
+                    resizing: prop,
+                  });
                 }}
-              />
-            )}
+                onMouseUp={() => {
+                  setScreenshotSelection({
+                    ...screenshotSelection,
+                    resizing: false,
+                  });
+                }}
+                onMouseMove={(e) => {
+                  if (!screenshotSelection.resizing) return;
+                  const container = (e.target as HTMLElement).closest(
+                    '.canvases'
+                  );
+                  if (!container) return;
+                  const boundingBox = container.getBoundingClientRect();
+
+                  const percentX =
+                    (100 * (e.clientX - boundingBox.left)) / boundingBox.width;
+                  const percentY =
+                    (100 * (e.clientY - boundingBox.top)) / boundingBox.height;
+
+                  const override: Partial<ScreenshotSelection> = {};
+                  if (
+                    ['left', 'tl', 'bl'].includes(screenshotSelection.resizing)
+                  ) {
+                    override.x1 = percentX;
+                  }
+                  if (
+                    ['right', 'tr', 'br'].includes(screenshotSelection.resizing)
+                  ) {
+                    override.x2 = percentX;
+                  }
+                  if (
+                    ['top', 'tl', 'tr'].includes(screenshotSelection.resizing)
+                  ) {
+                    override.y1 = percentY;
+                  }
+                  if (
+                    ['bottom', 'bl', 'br'].includes(
+                      screenshotSelection.resizing
+                    )
+                  ) {
+                    override.y2 = percentY;
+                  }
+
+                  setScreenshotSelection({
+                    ...screenshotSelection,
+                    ...override,
+                  });
+                }}
+              >
+                <div
+                  className="selection_box"
+                  style={{
+                    left:
+                      Math.min(screenshotSelection.x1, screenshotSelection.x2) +
+                      '%',
+                    top:
+                      Math.min(screenshotSelection.y1, screenshotSelection.y2) +
+                      '%',
+                    width:
+                      Math.abs(
+                        screenshotSelection.x1 - screenshotSelection.x2
+                      ) + '%',
+                    height:
+                      Math.abs(
+                        screenshotSelection.y1 - screenshotSelection.y2
+                      ) + '%',
+                  }}
+                >
+                  <div data-prop="left" className="t20 b20 l0 w20 ew" />
+                  <div data-prop="right" className="t20 b20 r0 w20 ew" />
+                  <div data-prop="bottom" className="l20 r20 b0 h20 ns" />
+                  <div data-prop="top" className="l20 r20 t0 h20 ns" />
+                  <div data-prop="tl" className="l0 t0 w20 h20 nwse" />
+                  <div data-prop="tr" className="r0 t0 w20 h20 nesw" />
+                  <div data-prop="bl" className="l0 b0 w20 h20 nesw" />
+                  <div data-prop="br" className="r0 b0 w20 h20 nwse" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       );
