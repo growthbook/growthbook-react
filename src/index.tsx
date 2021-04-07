@@ -4,7 +4,7 @@ import type {
   ExperimentResults,
 } from '@growthbook/growthbook/dist/types';
 import type GrowthBookUser from '@growthbook/growthbook/dist/user';
-import VariationSwitcher from './VariationSwitcher';
+import VariationSwitcher from './dev/VariationSwitcher';
 
 export { default as GrowthBookClient } from '@growthbook/growthbook';
 export type { default as GrowthBookUser } from '@growthbook/growthbook/dist/user';
