@@ -1,8 +1,8 @@
 <p align="center"><img src="https://www.growthbook.io/logos/growthbook-logo@2x.png" width="400px" /></p>
 
-# Growth Book React Library
+# Growth Book - React
 
-Powerful A/B testing for React. Built for developers to allow for modern A/B testing on your website or app, with no need to send data to 3rd parties. 
+Powerful A/B testing for React.
 
 ![Build Status](https://github.com/growthbook/growthbook-react/workflows/Build/badge.svg)
 
@@ -10,10 +10,11 @@ Powerful A/B testing for React. Built for developers to allow for modern A/B tes
 -  **Lightweight and fast** (4Kb gzipped)
 -  **No HTTP requests** everything is defined and evaluated locally
 -  Works for both **client and server-side** rendering
+-  **Dev Mode** for testing variations and taking screenshots
 -  **No flickering or blocking calls**
 -  Written in **Typescript** with an extensive test suite
 -  **Advanced user and page targeting**
--  **Use your existing event tracking** (Segment, Snowplow, Mixpanel, custom)
+-  **Use your existing event tracking** (GA, Segment, Mixpanel, custom)
 -  **Adjust variation weights and targeting** without deploying new code
 
 ## Community
@@ -96,7 +97,7 @@ export default withRunExperiment(MyComponent);
 
 If `process.env.NODE_ENV !== "production"` AND you are in a browser environment, dev mode is enabled by default. You can override this behavior by explicitly passing in the `dev` prop to `GrowthBookProvider`.
 
-Dev mode adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the experiment combinations.
+Dev Mode adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the experiment combinations. It also includes a screenshot tool to download images of all your variations.
 
 ![Dev Mode Variation Switcher](variation-switcher.png)
 
