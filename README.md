@@ -1,17 +1,25 @@
+<p align="center"><img src="https://www.growthbook.io/logos/growthbook-logo@2x.png" width="400px" /></p>
+
 # Growth Book React Library
 
-Powerful A/B testing for React.
+Powerful A/B testing for React. Built for developers to allow for modern A/B testing on your website or app, with no need to send data to 3rd parties. 
 
 ![Build Status](https://github.com/growthbook/growthbook-react/workflows/Build/badge.svg)
 
--  No external dependencies
--  Lightweight and fast (4Kb gzipped)
--  No HTTP requests, everything is defined and evaluated locally
--  Works for both client and server-side rendering
--  Written in Typescript with an extensive test suite
--  Advanced user and page targeting
--  Use your existing event tracking (Segment, Snowplow, Mixpanel, custom)
--  Adjust variation weights and targeting without deploying new code
+-  **No external dependencies**
+-  **Lightweight and fast** (4Kb gzipped)
+-  **No HTTP requests** everything is defined and evaluated locally
+-  Works for both **client and server-side** rendering
+-  **No flickering or blocking calls**
+-  Written in **Typescript** with an extensive test suite
+-  **Advanced user and page targeting**
+-  **Use your existing event tracking** (Segment, Snowplow, Mixpanel, custom)
+-  **Adjust variation weights and targeting** without deploying new code
+
+## Community
+
+Join [our Growth Book Users Slack community](https://join.slack.com/t/growthbookusers/shared_invite/zt-oiq9s1qd-dHHvw4xjpnoRV1QQrq6vUg) if you need help, want to chat, or are thinking of a new feature. We're here to help - and to make Growth Book even better.
+
 
 ## Installation
 
