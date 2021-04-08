@@ -39,11 +39,11 @@
   "size-limit": [
     {
       "path": "dist/growthbook-react.cjs.production.min.js",
-      "limit": "10 KB"
+      "limit": "4 KB"
     },
     {
       "path": "dist/growthbook-react.esm.js",
-      "limit": "10 KB"
+      "limit": "4 KB"
     }
   ],
   "devDependencies": {

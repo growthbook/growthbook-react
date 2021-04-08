@@ -62,8 +62,9 @@ export default function VariationSwitcher({
           h,
         });
       })
-      .catch((e) => {
-        console.error(e);
+      // This usually means the user clicked cancel on the
+      // screen sharing prompt
+      .catch(() => {
         setScreenshotData(null);
       });
   }, [screenshotExperiment, forceVariation, screenshotNumVariations]);

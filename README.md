@@ -7,7 +7,7 @@ Powerful A/B testing for React.
 ![Build Status](https://github.com/growthbook/growthbook-react/workflows/Build/badge.svg)
 
 -  **No external dependencies**
--  **Lightweight and fast** (4Kb gzipped)
+-  **Lightweight and fast** (2.6Kb gzipped)
 -  **No HTTP requests** everything is defined and evaluated locally
 -  Works for both **client and server-side** rendering
 -  **Dev Mode** for testing variations and taking screenshots
@@ -57,7 +57,7 @@ export default function App() {
 }
 ```
 
-Step 2a: Run experiments! (with React Hooks)
+Step 2: Run experiments!
 
 ```tsx
 import {useExperiment} from '@growthbook/growthbook-react';
@@ -72,26 +72,7 @@ export default function OtherComponent() {
 }
 ```
 
-Step 2b: Run experiments! (with Class Components)
-
-```tsx
-import {withRunExperiment} from '@growthbook/growthbook-react';
-
-class MyComponent extends Component {
-  render() {
-    // The `runExperiment` prop is identical to the `useExperiment` hook
-    const {value} = this.props.runExperiment({
-      key: "headline-test",
-      variations: ["Hello World", "Hola Mundo"]
-    });
-
-    return <h1>{value}</h1>
-  }
-}
-
-// Wrap your component in `withRunExperiment`
-export default withRunExperiment(MyComponent);
-```
+Use class components? We support that too!  [See Example](#react-class-components)
 
 ## Dev Mode
 
@@ -357,3 +338,27 @@ Integration is super easy:
 3.  At the start of your app, run `client.importOverrides(listFromCache)`
 
 Now you can start/stop tests, adjust coverage and variation weights, and apply a winning variation to 100% of traffic, all within the Growth Book App without deploying code changes to your site.
+
+
+## React Class Components
+
+If you aren't using functional components, we offer a `withRunExperiment` Higher Order Component instead.
+
+```tsx
+import {withRunExperiment} from '@growthbook/growthbook-react';
+
+class MyComponent extends Component {
+  render() {
+    // The `runExperiment` prop is identical to the `useExperiment` hook
+    const {value} = this.props.runExperiment({
+      key: "headline-test",
+      variations: ["Hello World", "Hola Mundo"]
+    });
+
+    return <h1>{value}</h1>
+  }
+}
+
+// Wrap your component in `withRunExperiment`
+export default withRunExperiment(MyComponent);
+```

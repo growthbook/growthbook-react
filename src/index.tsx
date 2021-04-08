@@ -5,6 +5,8 @@ import type {
 } from '@growthbook/growthbook/dist/types';
 import type GrowthBookUser from '@growthbook/growthbook/dist/user';
 import VariationSwitcher from './dev/VariationSwitcher';
+import { useForceVariation } from './useForceVariation';
+import { runExperiment } from './runExperiment';
 
 export { default as GrowthBookClient } from '@growthbook/growthbook';
 export type { default as GrowthBookUser } from '@growthbook/growthbook/dist/user';
@@ -16,36 +18,20 @@ export type {
   ClientConfigInterface,
 } from '@growthbook/growthbook/dist/types';
 
-const SESSION_STORAGE_KEY = 'gb_forced_variations';
-
-export const GrowthBookContext = React.createContext<{
+export type GrowthBookContextValue = {
   user: GrowthBookUser | null;
-}>({ user: null });
-
-function runExperiment<T>(
-  user: GrowthBookUser | null,
-  exp: Experiment<T>
-): ExperimentResults<T> {
-  if (user) {
-    return user.experiment(exp);
-  }
-
-  return {
-    experiment: exp,
-    variationId: 0,
-    inExperiment: false,
-    index: 0,
-    value: exp.variations[0],
-  };
+};
+export interface WithRunExperimentProps {
+  runExperiment: <T>(exp: Experiment<T>) => ExperimentResults<T>;
 }
+
+export const GrowthBookContext = React.createContext<GrowthBookContextValue>({
+  user: null,
+});
 
 export function useExperiment<T>(exp: Experiment<T>): ExperimentResults<T> {
   const { user } = React.useContext(GrowthBookContext);
   return runExperiment(user, exp);
-}
-
-export interface WithRunExperimentProps {
-  runExperiment: <T>(exp: Experiment<T>) => ExperimentResults<T>;
 }
 
 export const withRunExperiment = <P extends WithRunExperimentProps>(
@@ -64,61 +50,6 @@ export const withRunExperiment = <P extends WithRunExperimentProps>(
     }}
   </GrowthBookContext.Consumer>
 );
-
-function useForceVariation(
-  user: GrowthBookUser | null
-): {
-  forceVariation: (key: string, variation: number) => void;
-  renderCount: number;
-} {
-  const [init, setInit] = React.useState(false);
-  const [renderCount, setRenderCount] = React.useState(1);
-
-  React.useEffect(() => {
-    if (!user || init) return;
-    setInit(true);
-    if (process.env.NODE_ENV === 'production') {
-      return;
-    }
-    try {
-      let forced = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
-      if (forced) {
-        let json = JSON.parse(forced);
-        Object.keys(json).forEach((key) => {
-          user?.client.forcedVariations.set(key, json[key]);
-        });
-        setRenderCount((i) => i + 1);
-      }
-    } catch (e) {
-      // Ignore sessionStorage errors
-    }
-  }, [user, init]);
-
-  const forceVariation = /*#__PURE__*/ React.useCallback(
-    (key: string, variation: number) => {
-      if (!user) return;
-      user.client.forcedVariations.set(key, variation);
-      setRenderCount((i) => i + 1);
-      try {
-        let forced = window.sessionStorage.getItem(SESSION_STORAGE_KEY) || '{}';
-        let json = JSON.parse(forced);
-        json[key] = variation;
-        window.sessionStorage.setItem(
-          SESSION_STORAGE_KEY,
-          JSON.stringify(json)
-        );
-      } catch (e) {
-        // Ignore sessionStorage errors
-      }
-    },
-    [user]
-  );
-
-  return {
-    renderCount,
-    forceVariation,
-  };
-}
 
 export const GrowthBookProvider: React.FC<{
   user?: GrowthBookUser | null;

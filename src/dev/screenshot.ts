@@ -2,8 +2,6 @@ export function captureScreenshots(
   numVariations: number,
   forceVariation: (i: number) => void
 ): Promise<{ capturedImages: string[]; w: number; h: number }> {
-  console.log('Getting capture stream', numVariations);
-
   return (navigator.mediaDevices as any)
     .getDisplayMedia({
       video: {
@@ -19,7 +17,6 @@ export function captureScreenshots(
         canvas.width = settings.width || 1024;
         canvas.height = settings.height || 768;
         const ctx = canvas.getContext('2d');
-        console.log('video playing', ctx);
         if (!ctx) {
           reject(new Error('Could not get canvas context'));
           return;
@@ -44,14 +41,11 @@ export function captureScreenshots(
             for (let i = 0; i < numVariations; i++) {
               result = result
                 .then(() => {
-                  console.log('Forcing variation ', i);
                   forceVariation(i);
                   return new Promise((resolve) => setTimeout(resolve, 200));
                 })
                 .then(() => {
                   ctx.drawImage(video, 0, 0);
-                  console.log('captured variation image', i);
-
                   return new Promise<string>((resolve) => {
                     canvas.toBlob((b) => {
                       resolve(URL.createObjectURL(b));
@@ -87,7 +81,6 @@ export function captureScreenshots(
           }
         };
         video.srcObject = captureStream;
-        console.log('started video', settings);
       });
     });
 }
