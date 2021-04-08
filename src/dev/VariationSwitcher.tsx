@@ -149,7 +149,7 @@ export default function VariationSwitcher({
   background: ${COLORS.bg};
   border: 2px solid ${COLORS.text};
   text-align: center;
-  line-height: 26px;
+  line-height: 20px;
   box-sizing: border-box;
   font-size: 24px;
   box-shadow: 0 0 6px 2px ${COLORS.shadow};
@@ -289,6 +289,16 @@ export default function VariationSwitcher({
               </h5>
               <table>
                 <tbody>
+                  <tr
+                    className={assigned === -1 ? 'current' : ''}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      forceVariation(key, -1);
+                    }}
+                  >
+                    <th>-1</th>
+                    <td><em>not in experiment</em></td>
+                  </tr>
                   {possible.map((value, i) => (
                     <tr
                       key={i}
