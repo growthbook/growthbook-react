@@ -297,7 +297,9 @@ export default function VariationSwitcher({
                     }}
                   >
                     <th>-1</th>
-                    <td><em>not in experiment</em></td>
+                    <td>
+                      <em>not in experiment</em>
+                    </td>
                   </tr>
                   {possible.map((value, i) => (
                     <tr
