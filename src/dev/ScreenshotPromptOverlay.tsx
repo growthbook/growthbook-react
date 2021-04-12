@@ -16,6 +16,7 @@ export default function ScreenshotPromptOverlay() {
         color: COLORS.text,
         background: COLORS.bg,
         opacity: 0.8,
+        zIndex: 999999
       }}
     >
       <style>{`

@@ -73,6 +73,7 @@ body {
   right: 0;
   bottom: 0;
   font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  z-index: 999999;
 }
 .growthbook_screenshot.white {
   background: #fff;

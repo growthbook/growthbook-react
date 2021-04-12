@@ -130,6 +130,7 @@ export default function VariationSwitcher({
   font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   transition: opacity 0.2s, padding 0.2s;
   box-shadow: 0 0 6px 2px ${COLORS.shadow};
+  z-index: 999;
 }
 .growthbook_dev:hover {
   opacity: 1;
@@ -242,6 +243,11 @@ export default function VariationSwitcher({
   vertical-align: middle;
   transition: transform 0.1s;
   color: ${COLORS.text}
+}
+@media (max-width: 768px) {
+  .growthbook_dev button {
+    display: none;
+  }
 }
 .growthbook_dev button:hover {
   transform: scale(1.1);
