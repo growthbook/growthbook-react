@@ -31,27 +31,39 @@
 
 <body>
   <div class="container mt-3">
-    <h1 class="text-center">Growth Book Demo</h1>
+    <h1 class="text-center text-secondary font-weight-bold">
+      <img alt="Growth Book React" width=300 style="vertical-align:text-bottom;" src="https://camo.githubusercontent.com/877084ad7be5134a8e686f7da8585a02c721d326b874432af7dde3c58616b24d/68747470733a2f2f7777772e67726f777468626f6f6b2e696f2f6c6f676f732f67726f777468626f6f6b2d6c6f676f4032782e706e67"/> Demo
+    </h1>
+    <div class="text-secondary text-center p-1">
+      <strong>Powerful A/B Testing for React.</strong>
+    </div>
     <div id="root"></div>
     <hr/>
+    <div class="alert alert-secondary text-center">
+      <strong>Quick Start Instructions.</strong>
+      Full documentation on
+      <a href="https://github.com/growthbook/growthbook-react#readme">GitHub</a>
+    </div>
     <div class="row">
       <div class="col">
-        <h3>Step 1: Wrap your app in GrowthBookProvider</h3>
-        <pre><code class="language-jsx">import {GrowthBookClient, GrowthBookProvider} from '@growthbook/growthbook-react';
+        <h4><strong>Step 1.</strong> Wrap your app in GrowthBookProvider</h4>
+        <pre><code class="language-jsx">import {
+  GrowthBookClient, 
+  GrowthBookProvider
+} from '@growthbook/growthbook-react';
 
-// Create a client and setup tracking
+// Create a client and setup tracking (Mixpanel, Segment, GA, etc.)
 const client = new GrowthBookClient({
   onExperimentViewed: ({experimentId, variationId}) => {
-    // or Segment, GA, Amplitude, etc.
     mixpanel.track("Experiment Viewed", {experimentId, variationId});
   }
 });
 
 // Create the user you want to experiment on
-const user = client.user({id: "1"}); // TODO: pull id from Auth system
+// TODO: pull id from Auth system
+const user = client.user({id: "1"});
 
 export default function App() {
-  // Wrap your app in a GrowthBookProvider component
   return (
     &lt;GrowthBookProvider user={user}&gt;
       &lt;OtherComponent/&gt;
@@ -60,23 +72,30 @@ export default function App() {
 }</code></pre>
       </div>
       <div class="col">
-        <h3>Step 2: Run an Experiment!</h3>
-        <pre><code class="language-jsx">export default function OtherComponent() {
-  const { value } = useExperiment({
+        <h4><strong>Step 2.</strong> Run an Experiment!</h4>
+        <pre><code class="language-jsx">import {
+  useExperiment
+} from '@growthbook/growthbook-react';
+
+export default function OtherComponent() {
+  const { value: headline } = useExperiment({
     key: "headline",
-    variations: [
-      "Hello World",
-      "Hello Galaxy",
-      "Hello Universe"
-    ]
+    variations: ["Hello", "Hi", "Good Day"],
   });
 
-  return &lt;h1&gt;{value}&lt;/h1&gt;
+  const { value: darkmode } = useExperiment({
+    key: "darkmode",
+    variations: [false, true],
+    weights: [0.2, 0.8],
+  });
+
+  return (
+    &lt;div className={ darkmode ? "dark" : "light" }&gt;
+      &lt;h1&gt;{ headline }&lt;/h1&gt;
+      &lt;p&gt;...&lt;p/&gt;
+    &lt;/div&gt;
+  )
 }</code></pre>
-      <p class="text-center">
-        <a href="https://github.com/growthbook/growthbook-react#readme">View full README on GitHub</a>
-      </p>
-      </div>
     </div>
   </div>
 
@@ -96,9 +115,9 @@ const Demo = function () {
   const { value: headline } = useExperiment({
     key: "headline",
     variations: [
-      "Hello World",
-      "Hello Galaxy",
-      "Hello Universe"
+      "Hello",
+      "Hi",
+      "Good Day"
     ]
   });
 
@@ -111,7 +130,7 @@ const Demo = function () {
   });
 
   return (
-    <div className="container p-5">
+    <div className="container p-4">
       <div className={'card ' + (darkmode ? 'bg-dark text-light' : 'bg-light text-dark')}>
         <div className="card-body mb-3">
           <h2>{headline}</h2>
