@@ -22,6 +22,11 @@
       // Ignore session storage errors
     }
   </script>
+  <style>
+    .growthbook_dev, .growthbook_screenshot {
+      z-index: 999999;
+    }
+  </style>
 </head>
 
 <body>
@@ -37,7 +42,8 @@
 // Create a client and setup tracking
 const client = new GrowthBookClient({
   onExperimentViewed: ({experimentId, variationId}) => {
-    analytics.track("Experiment Viewed", {experimentId, variationId});
+    // or Segment, GA, Amplitude, etc.
+    mixpanel.track("Experiment Viewed", {experimentId, variationId});
   }
 });
 
@@ -65,7 +71,7 @@ export default function App() {
     ]
   });
 
-  return <h1>{value}</h1>
+  return &lt;h1&gt;{value}&lt;/h1&gt;
 }</code></pre>
       <p class="text-center">
         <a href="https://github.com/growthbook/growthbook-react#readme">View full README on GitHub</a>
