@@ -34,29 +34,27 @@
     <div class="text-secondary text-center p-1">
       <strong>Powerful A/B Testing for React Apps.</strong>
     </div>
-    <div id="root"></div>
-    <hr/>
+    <div id="root" class="mb-3"></div>
     <div class="alert alert-secondary text-center">
       <strong>Quick Start Instructions</strong>
     </div>
     <div class="row mb-3">
       <div class="col">
-        <h4><strong>Step 1.</strong> Wrap your app in GrowthBookProvider</h4>
+        <h4><strong>Step 1.</strong> Configure your app</h4>
         <pre><code class="language-jsx">import {
-  GrowthBookClient, 
-  GrowthBookProvider
-} from '@growthbook/growthbook-react';
+  GrowthBookClient, GrowthBookProvider
+} from '@growthbook/growthbook-react'
 
-// Create a client and setup tracking (Mixpanel, Segment, GA, etc.)
+// Create a client instance and setup tracking
 const client = new GrowthBookClient({
   onExperimentViewed: ({experimentId, variationId}) => {
-    mixpanel.track("Experiment Viewed", {experimentId, variationId});
+    // Mixpanel, Segment, GA, or custom tracking
+    mixpanel.track("Experiment Viewed", {experimentId, variationId})
   }
 });
 
-// Create the user you want to experiment on
-// TODO: pull id from Auth system
-const user = client.user({ id: "1" });
+// Specify the user id you want to experiment on
+const user = client.user({ id: mixpanel.get_distinct_id() })
 
 export default function App() {
   return (
@@ -67,22 +65,21 @@ export default function App() {
 }</code></pre>
       </div>
       <div class="col">
-        <h4><strong>Step 2.</strong> Run an Experiment!</h4>
+        <h4><strong>Step 2.</strong> Run an experiment</h4>
         <pre><code class="language-jsx">import {
   useExperiment
-} from '@growthbook/growthbook-react';
+} from '@growthbook/growthbook-react'
 
 export default function OtherComponent() {
   const { value: headline } = useExperiment({
     key: "new-headline",
     variations: ["Hello", "Hi", "Good Day"],
-  });
+  })
 
   const { value: darkmode } = useExperiment({
     key: "darkmode",
     variations: [false, true],
-    weights: [0.2, 0.8],
-  });
+  })
 
   return (
     &lt;div className={ darkmode ? "dark" : "light" }&gt;
@@ -94,10 +91,15 @@ export default function OtherComponent() {
     </div>
   </div>
   <div class="mb-5 text-center">
-    <h4><strong>Step 3.</strong> Read the Docs</h4>
+    <h4><strong>Step 3.</strong> Analyze results</h4>
     <p>
-      See all the features, configuration options, and examples on
-      <a href="https://github.com/growthbook/growthbook-react#readme">GitHub</a>.
+      Query your raw data, calculate significance, decide on a winner, and document your findings.
+    </p>
+    <p>
+      <em class="text-muted">
+        Shameless plug for the <a href="https://www.growthbook.io" class="font-weight-bold">Growth Book App</a>, which does all of this (and much more) automatically.
+      </em>
+      
     </p>
   </div>
 
@@ -136,7 +138,9 @@ export default function OtherComponent() {
           <div className={'card ' + (darkmode ? 'bg-dark text-light' : 'bg-light text-dark')}>
             <div className="card-body">
               <h2>{headline}</h2>
-              <p>Use the <strong>Growth Book Dev</strong> tool on the bottom left of the page to switch variations and take screenshots.</p>
+              <p>
+                This box is being A/B tested! Use the <strong>Growth Book Dev</strong> tool on the bottom left of the page to see other variations.
+              </p>
               <a href="https://github.com/growthbook/growthbook-react" className='btn btn-primary'>View on GitHub</a>
             </div>
           </div>
