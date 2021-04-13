@@ -245,7 +245,7 @@ export default function VariationSwitcher({
   color: ${COLORS.text}
 }
 @media (max-width: 768px) {
-  .growthbook_dev button {
+  .growthbook_dev h5 button {
     display: none;
   }
 }
