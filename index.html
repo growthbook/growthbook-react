@@ -9,20 +9,17 @@
 
   <!-- Bootstrap core CSS -->
   <link href="https://getbootstrap.com/docs/4.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-okaidia.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/prism-themes@1.6.0/themes/prism-dracula.css" rel="stylesheet">
 
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-core.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
-  <script>
-    try {
-      window.sessionStorage.setItem('gbdev_open', '1');
-    }
-    catch(e) {
-      // Ignore session storage errors
-    }
-  </script>
   <style>
+    @media(max-width: 767px) {
+      body {
+        padding-bottom: 400px;
+      }
+    }
     .growthbook_dev, .growthbook_screenshot {
       z-index: 999999;
     }
@@ -35,16 +32,14 @@
       <img alt="Growth Book React" width=300 style="vertical-align:text-bottom;" src="https://camo.githubusercontent.com/877084ad7be5134a8e686f7da8585a02c721d326b874432af7dde3c58616b24d/68747470733a2f2f7777772e67726f777468626f6f6b2e696f2f6c6f676f732f67726f777468626f6f6b2d6c6f676f4032782e706e67"/> Demo
     </h1>
     <div class="text-secondary text-center p-1">
-      <strong>Powerful A/B Testing for React.</strong>
+      <strong>Powerful A/B Testing for React Apps.</strong>
     </div>
     <div id="root"></div>
     <hr/>
     <div class="alert alert-secondary text-center">
-      <strong>Quick Start Instructions.</strong>
-      Full documentation on
-      <a href="https://github.com/growthbook/growthbook-react#readme">GitHub</a>
+      <strong>Quick Start Instructions</strong>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col">
         <h4><strong>Step 1.</strong> Wrap your app in GrowthBookProvider</h4>
         <pre><code class="language-jsx">import {
@@ -61,7 +56,7 @@ const client = new GrowthBookClient({
 
 // Create the user you want to experiment on
 // TODO: pull id from Auth system
-const user = client.user({id: "1"});
+const user = client.user({ id: "1" });
 
 export default function App() {
   return (
@@ -92,64 +87,72 @@ export default function OtherComponent() {
   return (
     &lt;div className={ darkmode ? "dark" : "light" }&gt;
       &lt;h1&gt;{ headline }&lt;/h1&gt;
-      &lt;p&gt;...&lt;/p&gt;
+      ...
     &lt;/div&gt;
   )
 }</code></pre>
     </div>
   </div>
+  <div class="mb-5 text-center">
+    <h4><strong>Step 3.</strong> Read the Docs</h4>
+    <p>
+      See all the features, configuration options, and examples on
+      <a href="https://github.com/growthbook/growthbook-react#readme">GitHub</a>.
+    </p>
+  </div>
 
   <script type="text/babel" data-type="module">
-import * as React from "https://jspm.dev/react";
-import * as ReactDOM from "https://jspm.dev/react-dom";
-import {
-  GrowthBookClient, 
-  GrowthBookProvider, 
-  useExperiment
-} from "https://jspm.dev/@growthbook/growthbook-react";
+    import * as React from "https://jspm.dev/react";
+    import * as ReactDOM from "https://jspm.dev/react-dom";
+    import {
+      GrowthBookClient, 
+      GrowthBookProvider, 
+      useExperiment
+    } from "https://jspm.dev/@growthbook/growthbook-react";
 
-const client = new GrowthBookClient();
-const user = client.user({id:"123"});
+    const client = new GrowthBookClient();
+    const user = client.user({id:"123"});
 
-const Demo = function () { 
-  const { value: headline } = useExperiment({
-    key: "new-headline",
-    variations: [
-      "Hello",
-      "Hi",
-      "Good Day"
-    ]
-  });
+    const Demo = function () { 
+      const { value: headline } = useExperiment({
+        key: "new-headline",
+        variations: [
+          "Hello",
+          "Hi",
+          "Good Day"
+        ]
+      });
 
-  const { value: darkmode } = useExperiment({
-    key: "darkmode",
-    variations: [
-      false,
-      true
-    ]
-  });
+      const { value: darkmode } = useExperiment({
+        key: "darkmode",
+        variations: [
+          false,
+          true
+        ]
+      });
 
-  return (
-    <div className="container p-4">
-      <div className={'card ' + (darkmode ? 'bg-dark text-light' : 'bg-light text-dark')}>
-        <div className="card-body mb-3">
-          <h2>{headline}</h2>
-          <p>Use the <strong>Growth Book Dev</strong> tool on the bottom left of the page to switch variations and take screenshots.</p>
+      return (
+        <div className="py-2">
+          <div className={'card ' + (darkmode ? 'bg-dark text-light' : 'bg-light text-dark')}>
+            <div className="card-body">
+              <h2>{headline}</h2>
+              <p>Use the <strong>Growth Book Dev</strong> tool on the bottom left of the page to switch variations and take screenshots.</p>
+              <a href="https://github.com/growthbook/growthbook-react" className='btn btn-primary'>View on GitHub</a>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  )
-}
+      )
+    }
 
-const App = function () {
-  return (
-    <GrowthBookProvider user={user}>
-      <Demo />
-    </GrowthBookProvider>
-  )
-}
+    const App = function () {
+      return (
+        <GrowthBookProvider user={user}>
+          <Demo />
+        </GrowthBookProvider>
+      )
+    }
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+    ReactDOM.render(<App/>, document.getElementById('root'));
   </script>
 </body>
 
