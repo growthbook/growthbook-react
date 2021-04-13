@@ -2,7 +2,7 @@
 
 # Growth Book - React
 
-Powerful A/B testing for React.
+Powerful A/B testing for React. [View Demo](https://growthbook.github.io/growthbook-react/)
 
 ![Build Status](https://github.com/growthbook/growthbook-react/workflows/Build/badge.svg)
 
@@ -30,25 +30,26 @@ or
 
 `npm install --save @growthbook/growthbook-react`
 
-## Quick Usage
+## Quick Start
 
-Step 1: Wrap your app in GrowthBookProvider
+### Step 1: Configure your app 
 ```tsx
-import {GrowthBookClient, GrowthBookProvider} from '@growthbook/growthbook-react';
+import {
+  GrowthBookClient, GrowthBookProvider
+} from '@growthbook/growthbook-react'
 
-// Create a client and setup tracking
+// Create a client instance and setup tracking
 const client = new GrowthBookClient({
   onExperimentViewed: ({experimentId, variationId}) => {
-    // Use whatever event tracking system you have in place
-    analytics.track("Experiment Viewed", {experimentId, variationId});
+    // Mixpanel, Segment, GA, or custom tracking
+    mixpanel.track("Experiment Viewed", {experimentId, variationId})
   }
 });
 
-export default function App() {
-  // TODO: Pull user id from your auth system (or use an anonymous device id)
-  const user = client.user({id: "1"});
+// Specify the user id you want to experiment on
+const user = client.user({ id: mixpanel.get_distinct_id() })
 
-  // Wrap your app in a GrowthBookProvider component
+export default function App() {
   return (
     <GrowthBookProvider user={user}>
       <OtherComponent/>
@@ -57,28 +58,43 @@ export default function App() {
 }
 ```
 
-Step 2: Run experiments!
+### Step 2: Run an experiment
 
 ```tsx
-import {useExperiment} from '@growthbook/growthbook-react';
+import { useExperiment } from '@growthbook/growthbook-react'
 
 export default function OtherComponent() {
-  const {value} = useExperiment({
-    key: "headline-test",
-    variations: ["Hello World", "Hola Mundo"]
-  });
+  const { value } = useExperiment({
+    key: "new-headline",
+    variations: ["Hello", "Hi", "Good Day"],
+  })
 
-  return <h1>{value}</h1>
+  return <h1>{ value }</h1>
 }
 ```
 
 Use class components? We support that too!  [See Example](#react-class-components)
 
+### Step 3: Analyze results
+
+Query your raw data, calculate significance, decide on a winner, and document your findings.
+
+Typically, this is done with one of the following:
+
+*  Online A/B testing calculators
+*  Built-in A/B test analysis in Mixpanel/Amplitude
+*  Python or R libraries and a Jupyter Notebook
+
+These are all pretty tedious to set up and maintain, which is why created the [Growth Book App](https://www.growthbook.io) 
+that automates all the messy and annoying bits and lets you focus on building your product.
+
 ## Dev Mode
 
-If `process.env.NODE_ENV !== "production"` AND you are in a browser environment, dev mode is enabled by default. You can override this behavior by explicitly passing in the `dev` prop to `GrowthBookProvider`.
+If `process.env.NODE_ENV !== "production"` AND you are in a browser environment, dev mode is enabled by default. You can override this behavior by explicitly passing in the `disableDevMode` prop to `GrowthBookProvider`.
 
 Dev Mode adds a variation switcher UI that floats on the bottom left of pages.  Use this to easily test out all the experiment combinations. It also includes a screenshot tool to download images of all your variations.
+
+[View Live Demo](https://growthbook.github.io/growthbook-react/)
 
 ![Dev Mode Variation Switcher](variation-switcher.png)
 
@@ -258,11 +274,9 @@ client.importOverrides({
 })
 ```
 
-## Event Tracking and Analyzing Results
+## Event Tracking
 
 This library only handles assigning variations to users.  The 2 other parts required for an A/B testing platform are Tracking and Analysis.
-
-### Tracking
 
 It's likely you already have some event tracking on your site with the metrics you want to optimize (Google Analytics, Segment, Mixpanel, etc.).
 
@@ -288,7 +302,7 @@ The object passed to your callback has the following properties:
 
 Below are examples for a few popular event tracking tools:
 
-#### Google Analytics
+### Google Analytics
 ```ts
 ga('send', 'event', 'experiment', experimentId, variationId, {
   // Custom dimension for easier analysis
@@ -296,7 +310,7 @@ ga('send', 'event', 'experiment', experimentId, variationId, {
 });
 ```
 
-#### Segment
+### Segment
 ```ts
 analytics.track("Experiment Viewed", {
   experimentId,
@@ -304,7 +318,7 @@ analytics.track("Experiment Viewed", {
 });
 ```
 
-#### Mixpanel
+### Mixpanel
 ```ts
 mixpanel.track("$experiment_started", {
   'Experiment name': experimentId,
@@ -312,37 +326,11 @@ mixpanel.track("$experiment_started", {
 });
 ```
 
-### Analysis
-
-For analysis, there are a few options:
-
-*  Online A/B testing calculators
-*  Built-in A/B test analysis in Mixpanel/Amplitude
-*  Python or R libraries and a Jupyter Notebook
-*  The [Growth Book App](https://www.growthbook.io) (more info below)
-
-### The Growth Book App
-
-Managing experiments and analyzing results at scale can be complicated, which is why we built the [Growth Book App](https://www.growthbook.io).  It's completely optional, but definitely worth checking out.
-
--  Document your experiments with screenshots, markdown, and comment threads
--  Connect to your existing data warehouse or analytics tool to automatically fetch results
-   -  Currently supports Snowflake, BigQuery, Redshift, Postgres, Mixpanel, GA, and Athena
--  Advanced bayesian statistics and automated data-quality checks (SRM, etc.)
--  Simple and affordable pricing
-
-Integration is super easy:
-
-1.  Create a Growth Book API key - https://docs.growthbook.io/api
-2.  Periodically fetch the latest experiment overrides from the API and cache in Redis, Mongo, etc.
-3.  At the start of your app, run `client.importOverrides(listFromCache)`
-
-Now you can start/stop tests, adjust coverage and variation weights, and apply a winning variation to 100% of traffic, all within the Growth Book App without deploying code changes to your site.
-
-
 ## React Class Components
 
 If you aren't using functional components, we offer a `withRunExperiment` Higher Order Component instead.
+
+**Note:** This library uses hooks internally, so still requires React 16.8 or above.
 
 ```tsx
 import {withRunExperiment} from '@growthbook/growthbook-react';
@@ -362,3 +350,20 @@ class MyComponent extends Component {
 // Wrap your component in `withRunExperiment`
 export default withRunExperiment(MyComponent);
 ```
+
+## The Growth Book App
+
+Managing experiments and analyzing results at scale can be complicated, which is why we built the [Growth Book App](https://www.growthbook.io).  It's completely optional, but definitely worth checking out.
+
+-  Document your experiments with screenshots, markdown, and comment threads
+-  Connect to your existing data warehouse or analytics tool to automatically fetch results
+   -  Currently supports Snowflake, BigQuery, Redshift, Postgres, Mixpanel, GA, and Athena
+-  Advanced bayesian statistics and automated data-quality checks (SRM, etc.)
+
+Integration is super easy:
+
+1.  Create a Growth Book API key - https://docs.growthbook.io/api
+2.  Periodically fetch the latest experiment overrides from the API and cache in Redis, Mongo, etc.
+3.  At the start of your app, run `client.importOverrides(listFromCache)`
+
+Now you can start/stop tests, adjust coverage and variation weights, and apply a winning variation to 100% of traffic, all within the Growth Book App without deploying code changes to your site.
