@@ -17,6 +17,8 @@ Powerful A/B testing for React.
 -  **Use your existing event tracking** (GA, Segment, Mixpanel, custom)
 -  **Adjust variation weights and targeting** without deploying new code
 
+**Note**: This library is just for running A/B tests. To analyze results, use the Growth Book App (https://github.com/growthbook/growthbook).
+
 ## Community
 
 Join [our Growth Book Users Slack community](https://join.slack.com/t/growthbookusers/shared_invite/zt-oiq9s1qd-dHHvw4xjpnoRV1QQrq6vUg) if you need help, want to chat, or are thinking of a new feature. We're here to help - and to make Growth Book even better.
@@ -84,36 +86,19 @@ Dev Mode adds a variation switcher UI that floats on the bottom left of pages.  
 
 ## Experiments
 
-The simplest experiment you can define has just 2 fields: `key` and `variations`.
+As shown above, the simplest experiment you can define has 2 fields: `key` and `variations`.
 
-There are a lot more configuration options you can specify.  Here is the full typescript definition:
+There are a lot more configuration options you can specify.  Here is the full list of options:
 
-```ts
-interface Experiment {
-    // The globally unique tracking key for the experiment
-    key: string;
-    // Array of variations
-    variations: any[];
-    // How to weight traffic between variations. Array of floats that add to 1.
-    weights?: number[];
-    // "running" is always active
-    // "draft" is only active during QA
-    // "stopped" is only active when forcing a winning variation
-    status?: "draft" | "running" | "stopped";
-    // What percent of users should be included in the experiment. Float from 0 to 1.
-    coverage?: number;
-    // Users can only be included in this experiment if the current URL matches this regex
-    url?: string;
-    // Array of strings if the format "{key} {operator} {value}"
-    // Users must pass all of these targeting rules to be included in this experiment
-    targeting?: string[];
-    // All users included in the experiment will be forced into the 
-    // specified variation index
-    force?: number;
-    // If true, use anonymous id for assigning, otherwise use logged-in user id
-    anon?: boolean;
-}
-```
+-  **key** (`string`) - The globally unique tracking key for the experiment
+-  **variations** (`any[]`) - The different variations to choose between
+-  **weights** (`number[]`) - How to weight traffic between variations. Must add to 1.
+-  **status** (`string`) - "running" is the default and always active. "draft" is only active during QA and development.  "stopped" is only active when forcing a winning variation to 100% of users.
+-  **coverage** (`number`) - What percent of users should be included in the experiment (between 0 and 1, inclusive)
+-  **url** (`string`) - Users can only be included in this experiment if the current URL matches this regex
+-  **targeting** (`string[]`) - Users must pass all of these targeting rules to be included in this experiment (see below for more info)
+-  **force** (`number`) - All users included in the experiment will be forced into the specific variation index
+-  **anon** (`boolean`) - If true, use anonymous id for assigning, otherwise use logged-in user id.  Defaults to false.
 
 ## Running Experiments
 
@@ -319,26 +304,26 @@ For analysis, there are a few options:
 *  Online A/B testing calculators
 *  Built-in A/B test analysis in Mixpanel/Amplitude
 *  Python or R libraries and a Jupyter Notebook
-*  The [Growth Book App](https://www.growthbook.io) (more info below)
+*  The Growth Book App (https://github.com/growthbook/growthbook)
 
 ### The Growth Book App
 
-Managing experiments and analyzing results at scale can be complicated, which is why we built the [Growth Book App](https://www.growthbook.io).  It's completely optional, but definitely worth checking out.
+Managing experiments and analyzing results at scale can be complicated, which is why we built the [Growth Book App](https://github.com/growthbook/growthbook).
 
--  Document your experiments with screenshots, markdown, and comment threads
--  Connect to your existing data warehouse or analytics tool to automatically fetch results
-   -  Currently supports Snowflake, BigQuery, Redshift, Postgres, Mixpanel, GA, and Athena
--  Advanced bayesian statistics and automated data-quality checks (SRM, etc.)
--  Simple and affordable pricing
+- Query multiple data sources (Snowflake, Redshift, BigQuery, Mixpanel, Postgres, Athena, and Google Analytics)
+- Bayesian statistics engine with support for binomial, count, duration, and revenue metrics
+- Drill down into A/B test results (e.g. by browser, country, etc.)
+- Lightweight idea board and prioritization framework
+- Document everything! (upload screenshots, add markdown comments, and more)
+- Automated email alerts when tests become significant
 
 Integration is super easy:
 
-1.  Create a Growth Book API key - https://docs.growthbook.io/api
+1.  Create a Growth Book API key
 2.  Periodically fetch the latest experiment overrides from the API and cache in Redis, Mongo, etc.
 3.  At the start of your app, run `client.importOverrides(listFromCache)`
 
 Now you can start/stop tests, adjust coverage and variation weights, and apply a winning variation to 100% of traffic, all within the Growth Book App without deploying code changes to your site.
-
 
 ## React Class Components
 
