@@ -5,9 +5,9 @@ import type {
 import type { GrowthBookUser } from '.';
 
 export function runExperiment<T>(
-  user: GrowthBookUser | null,
-  exp: Experiment<T>
-): ExperimentResults<T> {
+  user: GrowthBookUser<any> | null,
+  exp: Experiment<T, any>
+): ExperimentResults<T, any> {
   if (user) {
     return user.experiment(exp);
   }

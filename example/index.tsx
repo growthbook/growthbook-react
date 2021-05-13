@@ -9,8 +9,7 @@ const user = client.user({ id: "1" });
 const App = () => {
   return (
     <GrowthBookProvider 
-      user={user} 
-      dev={true}
+      user={user}
     >
       <Pricing />
     </GrowthBookProvider>

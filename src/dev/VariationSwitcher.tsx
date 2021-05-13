@@ -13,7 +13,7 @@ export default function VariationSwitcher({
   user,
 }: {
   forceVariation: (key: string, variation: number) => void;
-  user: GrowthBookUser;
+  user: GrowthBookUser<any>;
   renderCount: number;
 }): null | React.ReactElement {
   const [variations, setVariations] = React.useState<

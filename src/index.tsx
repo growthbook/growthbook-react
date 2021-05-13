@@ -19,17 +19,19 @@ export type {
 } from '@growthbook/growthbook/dist/types';
 
 export type GrowthBookContextValue = {
-  user: GrowthBookUser | null;
+  user: GrowthBookUser<any> | null;
 };
 export interface WithRunExperimentProps {
-  runExperiment: <T>(exp: Experiment<T>) => ExperimentResults<T>;
+  runExperiment: <T>(exp: Experiment<T, any>) => ExperimentResults<T, any>;
 }
 
 export const GrowthBookContext = React.createContext<GrowthBookContextValue>({
   user: null,
 });
 
-export function useExperiment<T>(exp: Experiment<T>): ExperimentResults<T> {
+export function useExperiment<T>(
+  exp: Experiment<T, any>
+): ExperimentResults<T, any> {
   const { user } = React.useContext(GrowthBookContext);
   return runExperiment(user, exp);
 }
@@ -52,7 +54,7 @@ export const withRunExperiment = <P extends WithRunExperimentProps>(
 );
 
 export const GrowthBookProvider: React.FC<{
-  user?: GrowthBookUser | null;
+  user?: GrowthBookUser<any> | null;
   disableDevMode?: boolean;
 }> = ({ children, user = null, disableDevMode = false }) => {
   // Mark this as pure since there are no side-effects

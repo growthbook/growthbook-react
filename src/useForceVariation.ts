@@ -4,7 +4,7 @@ import { GrowthBookUser } from '.';
 const SESSION_STORAGE_KEY = 'gb_forced_variations';
 
 export function useForceVariation(
-  user: GrowthBookUser | null
+  user: GrowthBookUser<any> | null
 ): {
   forceVariation: (key: string, variation: number) => void;
   renderCount: number;
