@@ -881,10 +881,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@growthbook/growthbook@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@growthbook/growthbook/-/growthbook-0.10.0.tgz#b037c0fd8f940de534ba78d8e01f6dc54bc732de"
-  integrity sha512-EOQ/b+30gOlRzDUY1YtH4z6v2nKvtZRpAa9V6ohl4bnS2io1NIaansTJQ088IM3HXqIdrzV9VEgmABqeySA+qA==
+"@growthbook/growthbook@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@growthbook/growthbook/-/growthbook-0.11.0.tgz#345417584d7e7e45e6e2efcb500ef216739601bb"
+  integrity sha512-YFLWXy1KFagCt7OJD3u0eOR+/HWIA14dzv3brF+fG2GCymrLhK/CQK0eDXhZ6t/vWVaKTu6eMacO4pzBBWszCA==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
