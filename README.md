@@ -1,13 +1,11 @@
-<p align="center"><img src="https://www.growthbook.io/logos/growthbook-logo@2x.png" width="400px" /></p>
-
-# Growth Book - React
+# Growth Book React
 
 Powerful A/B testing for React. [View Demo](https://growthbook.github.io/growthbook-react/)
 
-![Build Status](https://github.com/growthbook/growthbook-react/workflows/Build/badge.svg)
+![Build Status](https://github.com/growthbook/growthbook-js/workflows/Build/badge.svg) ![GZIP Size](https://img.shields.io/badge/gzip%20size-1.45KB-informational) ![NPM Version](https://img.shields.io/npm/v/@growthbook/growthbook-react)
 
 -  **No external dependencies**
--  **Lightweight and fast** (1.5Kb gzipped)
+-  **Lightweight and fast**
 -  **No HTTP requests** everything is defined and evaluated locally
 -  Works for both **client and server-side** rendering
 -  **Dev Mode** for testing variations and taking screenshots
@@ -16,6 +14,8 @@ Powerful A/B testing for React. [View Demo](https://growthbook.github.io/growthb
 -  Flexible experiment **targeting**
 -  **Use your existing event tracking** (GA, Segment, Mixpanel, custom)
 -  **Adjust variation weights and targeting** without deploying new code
+
+**Note**: This library is just for running A/B tests in React. To analyze results, use the Growth Book App (https://github.com/growthbook/growthbook).
 
 ## Community
 
@@ -86,7 +86,7 @@ export default function OtherComponent() {
 ```tsx
 import { withRunExperiment } from '@growthbook/growthbook-react';
 
-class MyComponent extends Component {
+class OtherComponent extends Component {
   render() {
     // The `runExperiment` prop is identical to the `useExperiment` hook
     const {value} = this.props.runExperiment({
@@ -97,7 +97,7 @@ class MyComponent extends Component {
   }
 }
 // Wrap your component in `withRunExperiment`
-export default withRunExperiment(MyComponent);
+export default withRunExperiment(OtherComponent);
 ```
 
 ### Step 3: Analyze results
