@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {
-  GrowthBookClient,
+  GrowthBook,
   GrowthBookProvider,
   useExperiment,
   withRunExperiment,
@@ -31,11 +31,10 @@ const TestedClassComponent = withRunExperiment(
 
 describe('GrowthBookProvider', () => {
   it("renders without crashing and doesn't add additional html", () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <h1>Hello World</h1>
       </GrowthBookProvider>,
       div
@@ -45,12 +44,11 @@ describe('GrowthBookProvider', () => {
   });
 
   it('runs an experiment with the useExperiment hook', () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <TestedComponent />
       </GrowthBookProvider>,
       div
@@ -60,12 +58,11 @@ describe('GrowthBookProvider', () => {
   });
 
   it('works using the withRunExperiment HoC', () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <TestedClassComponent />
       </GrowthBookProvider>,
       div
@@ -78,7 +75,7 @@ describe('GrowthBookProvider', () => {
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider>
+      <GrowthBookProvider growthbook={new GrowthBook({})}>
         <TestedComponent />
       </GrowthBookProvider>,
       div
@@ -88,12 +85,11 @@ describe('GrowthBookProvider', () => {
   });
 
   it('renders the variation switcher in dev mode', async () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <TestedComponent />
       </GrowthBookProvider>,
       div
@@ -105,12 +101,11 @@ describe('GrowthBookProvider', () => {
   });
 
   it('does not render the variation switcher when disableDevMode is set to true', async () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user} disableDevMode={true}>
+      <GrowthBookProvider growthbook={growthbook} disableDevMode={true}>
         <TestedComponent />
       </GrowthBookProvider>,
       div
@@ -125,12 +120,11 @@ describe('GrowthBookProvider', () => {
     const node_env = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
 
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <TestedComponent />
       </GrowthBookProvider>,
       div
@@ -144,12 +138,11 @@ describe('GrowthBookProvider', () => {
   });
 
   it('re-renders when switching variations', async () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <TestedComponent />
       </GrowthBookProvider>,
       div
@@ -173,12 +166,11 @@ describe('GrowthBookProvider', () => {
 
   it('starts variation switcher collapsed and expands when clicked', async () => {
     await act(async () => {
-      const client = new GrowthBookClient();
-      const user = client.user({ id: '1' });
+      const growthbook = new GrowthBook({ user: { id: '1' } });
       const div = document.createElement('div');
 
       ReactDOM.render(
-        <GrowthBookProvider user={user}>
+        <GrowthBookProvider growthbook={growthbook}>
           <TestedComponent />
         </GrowthBookProvider>,
         div
@@ -201,12 +193,11 @@ describe('GrowthBookProvider', () => {
   });
 
   it('does not render variation switcher until the useExperiment hook is used', () => {
-    const client = new GrowthBookClient();
-    const user = client.user({ id: '1' });
+    const growthbook = new GrowthBook({ user: { id: '1' } });
     const div = document.createElement('div');
 
     ReactDOM.render(
-      <GrowthBookProvider user={user}>
+      <GrowthBookProvider growthbook={growthbook}>
         <h1>foo</h1>
       </GrowthBookProvider>,
       div
