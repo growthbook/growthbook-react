@@ -1,37 +1,32 @@
 import * as React from 'react';
-import type {
-  Experiment,
-  ExperimentResults,
-} from '@growthbook/growthbook/dist/types';
-import type GrowthBookUser from '@growthbook/growthbook/dist/user';
+import type { Experiment, Result } from '@growthbook/growthbook';
+import { default as GrowthBook } from '@growthbook/growthbook';
+
 import VariationSwitcher from './dev/VariationSwitcher';
 import { useForceVariation } from './useForceVariation';
-import { runExperiment } from './runExperiment';
 
-export { default as GrowthBookClient } from '@growthbook/growthbook';
-export type { default as GrowthBookUser } from '@growthbook/growthbook/dist/user';
-export type {
+export {
+  default as GrowthBook,
+  Context,
   Experiment,
-  ExperimentResults,
+  Result,
   ExperimentOverride,
-  TrackExperimentFunctionProps,
-  ClientConfigInterface,
-} from '@growthbook/growthbook/dist/types';
+} from '@growthbook/growthbook';
 
 export type GrowthBookContextValue = {
-  user: GrowthBookUser | null;
+  growthbook: GrowthBook;
 };
 export interface WithRunExperimentProps {
-  runExperiment: <T>(exp: Experiment<T>) => ExperimentResults<T>;
+  runExperiment: <T>(exp: Experiment<T>) => Result<T>;
 }
 
 export const GrowthBookContext = React.createContext<GrowthBookContextValue>({
-  user: null,
+  growthbook: new GrowthBook({}),
 });
 
-export function useExperiment<T>(exp: Experiment<T>): ExperimentResults<T> {
-  const { user } = React.useContext(GrowthBookContext);
-  return runExperiment(user, exp);
+export function useExperiment<T>(exp: Experiment<T>): Result<T> {
+  const { growthbook } = React.useContext(GrowthBookContext);
+  return growthbook.run(exp);
 }
 
 export const withRunExperiment = <P extends WithRunExperimentProps>(
@@ -40,11 +35,11 @@ export const withRunExperiment = <P extends WithRunExperimentProps>(
   props
 ): JSX.Element => (
   <GrowthBookContext.Consumer>
-    {({ user }): JSX.Element => {
+    {({ growthbook }): JSX.Element => {
       return (
         <Component
           {...(props as P)}
-          runExperiment={(exp) => runExperiment(user, exp)}
+          runExperiment={(exp) => growthbook.run(exp)}
         />
       );
     }}
@@ -52,19 +47,21 @@ export const withRunExperiment = <P extends WithRunExperimentProps>(
 );
 
 export const GrowthBookProvider: React.FC<{
-  user?: GrowthBookUser | null;
+  growthbook: GrowthBook;
   disableDevMode?: boolean;
-}> = ({ children, user = null, disableDevMode = false }) => {
+}> = ({ children, growthbook, disableDevMode = false }) => {
   // Mark this as pure since there are no side-effects
   // In production, these variables are never used so they will be removed from the output
-  const { renderCount, forceVariation } = /*#__PURE__*/ useForceVariation(user);
+  const { renderCount, forceVariation } = /*#__PURE__*/ useForceVariation(
+    growthbook
+  );
 
   let devMode: React.ReactNode = null;
   if (process.env.NODE_ENV !== 'production') {
-    if (user && !disableDevMode) {
+    if (!disableDevMode) {
       devMode = (
         <VariationSwitcher
-          user={user}
+          growthbook={growthbook}
           renderCount={renderCount}
           forceVariation={forceVariation}
         />
@@ -75,7 +72,7 @@ export const GrowthBookProvider: React.FC<{
   return (
     <GrowthBookContext.Provider
       value={{
-        user,
+        growthbook,
       }}
     >
       {children}

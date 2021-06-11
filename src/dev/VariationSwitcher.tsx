@@ -1,5 +1,5 @@
 import * as React from 'react';
-import GrowthBookUser from '@growthbook/growthbook/dist/user';
+import type GrowthBook from '@growthbook/growthbook';
 import { captureScreenshots } from './screenshot';
 import CameraIcon from './CameraIcon';
 import { default as COLORS } from './colors';
@@ -10,10 +10,10 @@ const SESSION_STORAGE_OPEN_KEY = 'gbdev_open';
 
 export default function VariationSwitcher({
   forceVariation,
-  user,
+  growthbook,
 }: {
   forceVariation: (key: string, variation: number) => void;
-  user: GrowthBookUser;
+  growthbook: GrowthBook;
   renderCount: number;
 }): null | React.ReactElement {
   const [variations, setVariations] = React.useState<
@@ -71,18 +71,40 @@ export default function VariationSwitcher({
 
   // When a user is put into an experiment, schedule an update of the UI
   React.useEffect(() => {
+    const refreshVariations = () => {
+      const results = growthbook.getAllResults();
+      const v: Map<
+        string,
+        {
+          assigned: number;
+          possible: any[];
+        }
+      > = new Map();
+
+      results.forEach(({ experiment: e, result: r }) => {
+        v.set(e.key, {
+          assigned: r.variationId,
+          possible: e.variations,
+        });
+      });
+
+      setVariations(v);
+    };
+
     let current = true;
-    const unsubscriber = user.subscribe(() => {
+    const unsubscriber = growthbook.subscribe(() => {
       requestAnimationFrame(() => {
-        current && setVariations(user.getAssignedVariations());
+        if (!current) return;
+        refreshVariations();
       });
     });
-    setVariations(user.getAssignedVariations());
+    refreshVariations();
+
     return () => {
       current = false;
       unsubscriber();
     };
-  }, [user]);
+  }, [growthbook]);
 
   if (process.env.NODE_ENV === 'production') {
     return null;
@@ -295,18 +317,6 @@ export default function VariationSwitcher({
               </h5>
               <table>
                 <tbody>
-                  <tr
-                    className={assigned === -1 ? 'current' : ''}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      forceVariation(key, -1);
-                    }}
-                  >
-                    <th>-1</th>
-                    <td>
-                      <em>not in experiment</em>
-                    </td>
-                  </tr>
                   {possible.map((value, i) => (
                     <tr
                       key={i}
