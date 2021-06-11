@@ -14,6 +14,25 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-core.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/plugins/autoloader/prism-autoloader.min.js"></script>
+
+  <script async src="https://ga.jspm.io/npm:es-module-shims@0.10.1/dist/es-module-shims.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "@growthbook/growthbook-react": "https://ga.jspm.io/npm:@growthbook/growthbook-react@0.4.0/dist/dev.index.js",
+      "react": "https://ga.jspm.io/npm:react@17.0.1/dev.index.js",
+      "react-dom": "https://ga.jspm.io/npm:react-dom@17.0.1/dev.index.js"
+    },
+    "scopes": {
+      "https://ga.jspm.io/": {
+        "@growthbook/growthbook": "https://ga.jspm.io/npm:@growthbook/growthbook@0.11.0/dist/dev.index.js",
+        "object-assign": "https://ga.jspm.io/npm:object-assign@4.1.1/index.js",
+        "scheduler": "https://ga.jspm.io/npm:scheduler@0.20.2/dev.index.js",
+        "scheduler/tracing": "https://ga.jspm.io/npm:scheduler@0.20.2/dev.tracing.js"
+      }
+    }
+  }
+  </script>
   <style>
     @media(max-width: 767px) {
       body {
@@ -38,18 +57,6 @@
       display: none;
     }
 
-    .growthbook_dev tr:first-child {
-      display: none;
-    }
-
-    .growthbook_dev tr:nth-child(2) th {
-      border-top-left-radius: 6px;
-    }
-
-    .growthbook_dev tr:nth-child(2) td:last-child {
-      border-top-right-radius: 6px;
-    }
-
     .growthbook_dev table {
       margin: 5px 0 !important;
     }
@@ -70,23 +77,23 @@
     <div class="row mb-3">
       <div class="col">
         <h4><strong>Step 1.</strong> Configure your app</h4>
-        <pre><code class="language-jsx">import { GrowthBookClient, GrowthBookProvider }
+        <pre><code class="language-jsx">import { GrowthBook } 
   from '@growthbook/growthbook-react'
 
-// Create a client instance and setup tracking
-const client = new GrowthBookClient({
-  onExperimentViewed: ({ experimentId, variationId }) => {
-    // Mixpanel, Segment, GA, or custom tracking
-    mixpanel.track("Experiment Viewed", { experimentId, variationId })
+// Create a GrowthBook instance
+const growthbook = new GrowthBook({
+  user: { id: mixpanel.get_distinct_id() },
+  trackingCallback: (experiment, result) => {
+    mixpanel.track("Experiment Viewed", {
+      experiment: experiment.key,
+      variation: result.variationId
+    })
   }
 });
 
-// Specify the user id you want to experiment on
-const user = client.user({ id: mixpanel.get_distinct_id() })
-
 export default function App() {
   return (
-    &lt;GrowthBookProvider user={user}&gt;
+    &lt;GrowthBookProvider growthbook={growthbook}&gt;
       &lt;OtherComponent/&gt;
     &lt;/GrowthBookProvider&gt;
   )
@@ -98,19 +105,19 @@ export default function App() {
   from '@growthbook/growthbook-react'
 
 export default function OtherComponent() {
-  const { value: greeting } = useExperiment({
+  const greeting = useExperiment({
     key: "new-greeting",
     variations: ["Hello", "Hi", "Good Day"],
   })
 
-  const { value: darkmode } = useExperiment({
+  const darkmode = useExperiment({
     key: "darkmode",
     variations: [false, true],
   })
 
   return (
-    &lt;div className={ darkmode ? "dark" : "light" }&gt;
-      &lt;h1&gt;{ greeting } World&lt;/h1&gt;
+    &lt;div className={ darkmode.value ? "dark" : "light" }&gt;
+      &lt;h1&gt;{ greeting.value } World&lt;/h1&gt;
       ...
     &lt;/div&gt;
   )
@@ -124,27 +131,23 @@ export default function OtherComponent() {
       </p>
       <p>
         <em class="text-muted">
-          Shameless plug for the <a href="https://www.growthbook.io" class="font-weight-bold">Growth Book App</a>, which
+          Check out the open-source <a href="https://www.growthbook.io" class="font-weight-bold">Growth Book App</a>, which
           does all of this (and much more) for you automatically.
         </em>
-
       </p>
     </div>
 
     <script type="text/babel" data-type="module">
-      import * as React from "https://jspm.dev/react";
-      import * as ReactDOM from "https://jspm.dev/react-dom";
-      import {
-        GrowthBookClient,
-        GrowthBookProvider,
-        useExperiment
-      } from "https://jspm.dev/@growthbook/growthbook-react";
+      import * as React from "react";
+      import * as ReactDOM from "react-dom";
+      import * as gb from "@growthbook/growthbook-react";
 
-      const client = new GrowthBookClient();
-      const user = client.user({ id: "123" });
+      const {GrowthBook, GrowthBookProvider, useExperiment} = gb;
+
+      const growthbook = new GrowthBook({user:{id: "123"}});
 
       const Demo = function () {
-        const { value: greeting } = useExperiment({
+        const greeting = useExperiment({
           key: "new-greeting",
           variations: [
             "Hello",
@@ -153,7 +156,7 @@ export default function OtherComponent() {
           ]
         });
 
-        const { value: darkmode } = useExperiment({
+        const darkmode = useExperiment({
           key: "darkmode",
           variations: [
             false,
@@ -162,14 +165,14 @@ export default function OtherComponent() {
         });
 
         return (
-          <div className={`d-flex flex-column mr-3 p-4 border rounded ${darkmode ? 'bg-dark text-light' : 'bg-light text-dark'}`} style={{ flex: 1 }}>
-            <h2>{greeting} World</h2>
+          <div className={`d-flex flex-column mr-3 p-4 border rounded ${darkmode.value ? 'bg-dark text-light' : 'bg-light text-dark'}`} style={{ flex: 1 }}>
+            <h2>{greeting.value} World</h2>
             <p>This box is being A/B tested!</p>
             <p>Use the <strong>Growth Book Dev</strong> tool on the right to change variations.</p>
             <div style={{flex:1}}/>
             <div className="d-md-flex">
-              <div className="align-self-center mr-2 mb-2 mb-md-0">View the full docs on <a className={darkmode?'text-warning':''} href="https://github.com/growthbook/growthbook-react">GitHub</a></div>
-              <iframe src="https://ghbtns.com/github-btn.html?user=growthbook&amp;repo=growthbook-react&amp;type=star&amp;count=true&amp;size=large" frameborder="0" scrolling="0" width="130" height="30" title="GitHub"></iframe>
+              <div className="align-self-center mr-2 mb-2 mb-md-0">View the full docs on <a className={darkmode.value?'text-warning':''} href="https://github.com/growthbook/growthbook-react">GitHub</a></div>
+              <iframe src="https://ghbtns.com/github-btn.html?user=growthbook&amp;repo=growthbook-react&amp;type=star&amp;count=true&amp;size=large" frameBorder="0" scrolling="0" width="130" height="30" title="GitHub"></iframe>
             </div>
           </div>
         )
@@ -177,7 +180,7 @@ export default function OtherComponent() {
 
       const App = function () {
         return (
-          <GrowthBookProvider user={user}>
+          <GrowthBookProvider growthbook={growthbook}>
             <Demo />
           </GrowthBookProvider>
         )
